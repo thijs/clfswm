@@ -279,3 +279,25 @@
   (lambda (c)
     (and (xlib:window-p c)
          (string-equal (xlib:get-wm-class c) class-string))))
+
+
+(defun nw-absorb-test-command (command-string)
+  (lambda (c)
+    (and (xlib:window-p c)
+         (string-equal (get-window-command-string c) command-string))))
+
+
+(defun get-proc-command (pid)
+  (let ((proc (do-shell (format nil "ps -p ~a -o cmd=" pid) nil t))
+        (proc-list nil))
+    (loop for line = (read-line proc nil nil)
+       while line
+       do (push line proc-list))
+    (dbg proc-list)
+    (first proc-list)))
+
+
+(defun get-window-command-string (window)
+  (when (xlib:window-p window)
+    (let ((window-pid (first (xlib:get-property window :_NET_WM_PID))))
+      (get-proc-command window-pid))))

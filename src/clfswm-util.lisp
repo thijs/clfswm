@@ -1218,6 +1218,8 @@ For window: set current child to window or its parent according to window-parent
                              (format nil "Window class: ~A" (xlib:get-wm-class window))
                              (format nil "Window type:  ~:(~A~)" (window-type window))
                              (format nil "Window id:    0x~X" (xlib:window-id window))
+                             (format nil "Window PID:   ~D" (first
+                                                             (xlib:get-property window :_NET_WM_PID)))
                              (format nil "Window transparency: ~A" (* 100 (window-transparency window)))
                              (format nil " X=~A  Y=~A  W=~A  H=~A"
                                      (x-drawable-x window) (x-drawable-y window)
