@@ -93,7 +93,8 @@
 
 (defun add-menu-key (menu-name key value &optional (root *menu*))
   (let ((menu (find-menu menu-name root)))
-    (add-item (make-menu-item :key (find-next-menu-key key menu) :value value) (find-menu menu-name root))))
+    (add-item
+     (make-menu-item :key (find-next-menu-key key menu) :value value) (find-menu menu-name root))))
 
 (defun add-sub-menu (menu-or-name key sub-menu-name &optional (doc "Sub menu") (root *menu*))
   (let ((menu (if (or (stringp menu-or-name) (symbolp menu-or-name))

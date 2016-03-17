@@ -43,9 +43,12 @@
                                      *circulate-text-limite*)))
          (len (length text)))
     (xlib:draw-glyphs *pixmap-buffer* *circulate-gc*
-                      (truncate (/ (- *circulate-width* (* (xlib:max-char-width *circulate-font*) len)) 2))
+                      (truncate (/
+                                 (- *circulate-width* (* (xlib:max-char-width *circulate-font*) len))
+                                 2))
                       (truncate (/ (+ *circulate-height* (- (xlib:font-ascent *circulate-font*)
-                                                            (xlib:font-descent *circulate-font*))) 2))
+                                                            (xlib:font-descent *circulate-font*)))
+                                   2))
                       text))
   (copy-pixmap-buffer *circulate-window* *circulate-gc*))
 
@@ -406,22 +409,26 @@
 
 
 (defun select-brother-spatial-move-right-take-current ()
-  "Select spatially the nearest brother of the current child in the right direction - move current focused child"
+  "Select spatially the nearest brother of the current child in the right direction
+ - move current focused child"
   (with-move-current-focused-window ()
     (select-brother-spatial-move-right)))
 
 
 (defun select-brother-spatial-move-left-take-current ()
-  "Select spatially the nearest brother of the current child in the left direction - move current focused child"
+  "Select spatially the nearest brother of the current child in the left direction
+ - move current focused child"
   (with-move-current-focused-window ()
     (select-brother-spatial-move-left)))
 
 (defun select-brother-spatial-move-down-take-current ()
-  "Select spatially the nearest brother of the current child in the down direction - move current focused child"
+  "Select spatially the nearest brother of the current child in the down direction
+ - move current focused child"
   (with-move-current-focused-window ()
     (select-brother-spatial-move-down)))
 
 (defun select-brother-spatial-move-up-take-current ()
-  "Select spatially the nearest brother of the current child in the up direction - move current focused child"
+  "Select spatially the nearest brother of the current child in the up direction
+ - move current focused child"
   (with-move-current-focused-window ()
     (select-brother-spatial-move-up)))

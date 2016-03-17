@@ -84,8 +84,15 @@ or<br> CLFSWM> (produce-all-docs)"))))
   (format t "Producing html keys documentation in ~S " filename)
   (with-open-file (stream filename :direction :output
                           :if-exists :supersede :if-does-not-exist :create)
-    (produce-doc-html (list *main-keys* *main-mouse* *second-keys* *second-mouse*
-                            *info-keys* *info-mouse* *circulate-keys* *expose-keys* *expose-mouse*)
+    (produce-doc-html (list *main-keys*
+                            *main-mouse*
+                            *second-keys*
+                            *second-mouse*
+                            *info-keys*
+                            *info-mouse*
+                            *circulate-keys*
+                            *expose-keys*
+                            *expose-mouse*)
                       stream))
   (format t " done~%"))
 
@@ -101,13 +108,16 @@ or<br> CLFSWM> (produce-all-docs)"))))
     (dotimes (i (length (gethash 'name hk)))
       (format stream "-"))
     (format stream "~2%")
-    (maphash #'(lambda (k v)
-                 (when (consp k)
-                   (format stream "~&  ~20@<~{~@(~A~) ~}~> ~13@<~@(~A~)~>   ~A~%"
-                           (state->modifiers (second k))
-                           (remove #\# (remove #\\ (format nil "~S" (or (is-string-keysym (first k)) (first k)))))
-                           (documentation (or (first v) (third v)) 'function))))
-             hk)
+    (maphash
+     #'(lambda (k v)
+         (when (consp k)
+           (format stream "~&  ~20@<~{~@(~A~) ~}~> ~13@<~@(~A~)~>   ~A~%"
+                   (state->modifiers (second k))
+                   (remove #\#
+                           (remove #\\
+                                   (format nil "~S" (or (is-string-keysym (first k)) (first k)))))
+                   (documentation (or (first v) (third v)) 'function))))
+     hk)
     (format stream "~2&"))
   (when display-producing-doc
     (format stream "~2%This documentation was produced with the CLFSWM auto-doc functions.
@@ -187,15 +197,16 @@ CLFSWM> (produce-all-docs)~2%")))
                (dolist (item (menu-item base))
                  (typecase item
                    (menu (push `(p ,(format nil "~A: ~A" (menu-name item) (menu-doc item))) menu-list))
-                   (menu-item (push `(p ,(aif (menu-item-key item)
-                                              (format nil "~A: ~A" it
-                                                      (typecase (menu-item-value item)
-                                                        (menu (format nil "<a href=\"#~A\">< ~A ></a>"
-                                                                      (menu-name (menu-item-value item))
-                                                                      (menu-doc (menu-item-value item))))
-                                                        (t (documentation (menu-item-value item) 'function))))
-                                              (format nil "~A" (menu-item-value item))))
-                                    menu-list))))
+                   (menu-item
+                    (push `(p ,(aif (menu-item-key item)
+                                    (format nil "~A: ~A" it
+                                            (typecase (menu-item-value item)
+                                              (menu (format nil "<a href=\"#~A\">< ~A ></a>"
+                                                            (menu-name (menu-item-value item))
+                                                            (menu-doc (menu-item-value item))))
+                                              (t (documentation (menu-item-value item) 'function))))
+                                    (format nil "~A" (menu-item-value item))))
+                          menu-list))))
                (push '<hr> menu-list)
                (dolist (item (menu-item base))
                  (typecase item
@@ -239,8 +250,12 @@ or<br> CLFSWM> (produce-all-docs)"))))
                            (documentation (second corner) 'function)
                            "---")))))
     (format stream "Here are the actions associated to screen corners in CLFSWM:")
-    (dolist (corner '(*corner-main-mode-left-button* *corner-main-mode-middle-button* *corner-main-mode-right-button*
-                      *corner-second-mode-left-button* *corner-second-mode-middle-button* *corner-second-mode-right-button*))
+    (dolist (corner '(*corner-main-mode-left-button*
+                      *corner-main-mode-middle-button*
+                      *corner-main-mode-right-button*
+                      *corner-second-mode-left-button*
+                      *corner-second-mode-middle-button*
+                      *corner-second-mode-right-button*))
       (print-doc corner))
     (format stream "~2%This documentation was produced with the CLFSWM auto-doc functions.
 To reproduce it, use the produce-corner-doc-in-file or
@@ -268,16 +283,21 @@ CLFSWM> (produce-all-docs)~2%")))
                (push `(h3 ,corner-list) corner-html)
                (push `("table class=\"ex\" cellspacing=\"5\" border=\"0\" width=\"100%\""
                        ,@(loop :for corner :in (symbol-value corner-list)
-                            :collect `(tr ("td align=\"left\" width=\"1%\" style=\"color:#FF0000\" nowrap"
-                                           ,(format nil "~:(~A~):" (first corner)))
-                                          ("td style=\"color:#0000FF\" nowrap"
-                                           ,(if (fboundp (second corner))
-                                                (documentation (second corner) 'function)
-                                                "---")))))
+                            :collect
+                            `(tr ("td align=\"left\" width=\"1%\" style=\"color:#FF0000\" nowrap"
+                                  ,(format nil "~:(~A~):" (first corner)))
+                                 ("td style=\"color:#0000FF\" nowrap"
+                                  ,(if (fboundp (second corner))
+                                       (documentation (second corner) 'function)
+                                       "---")))))
                      corner-html))
              (fill-corner-list ()
-               (dolist (corner '(*corner-main-mode-left-button* *corner-main-mode-middle-button* *corner-main-mode-right-button*
-                                 *corner-second-mode-left-button* *corner-second-mode-middle-button* *corner-second-mode-right-button*))
+               (dolist (corner '(*corner-main-mode-left-button*
+                                 *corner-main-mode-middle-button*
+                                 *corner-main-mode-right-button*
+                                 *corner-second-mode-left-button*
+                                 *corner-second-mode-middle-button*
+                                 *corner-second-mode-right-button*))
                  (one-corner corner))))
       (fill-corner-list)
       (produce-html `(html

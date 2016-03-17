@@ -612,7 +612,9 @@
 ;;; Left and space layout: like left layout but leave a space on the left
 (defun layout-ask-space (msg slot &optional (default 100))
   (when (frame-p (current-child))
-    (let ((new-space (or (query-number msg (or (frame-data-slot (current-child) slot) default)) default)))
+    (let ((new-space (or
+                      (query-number msg (or (frame-data-slot (current-child) slot) default))
+                      default)))
       (setf (frame-data-slot (current-child) slot) new-space))))
 
 

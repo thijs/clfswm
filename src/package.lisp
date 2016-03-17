@@ -303,7 +303,8 @@ Replace xlib:drawable-* functions with x-drawable-* equivalents"
        (defun ,set-symbol (window ,argname)
          (if (typep ,argname ',type)
              (setf (,xlib-equiv-symbol window) ,argname)
-             (dbg ',(create-symbol 'drawable-type-error- argname) window ,argname (xlib:wm-name window))))
+             (dbg
+              ',(create-symbol 'drawable-type-error- argname) window ,argname (xlib:wm-name window))))
        (defsetf ,fun-symbol ,set-symbol))))
 
 

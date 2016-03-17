@@ -75,12 +75,13 @@
           (gc (expose-child-gc ex-child)))
       (when (and window gc)
         (clear-pixmap-buffer window gc)
-        (xlib:with-gcontext (gc :foreground (get-color (if (substring-equal *query-string* (expose-child-key ex-child))
-                                                           *expose-foreground-letter*
-                                                           *expose-foreground-letter-nok*))
-                                :background (get-color (if (string-equal *query-string* (expose-child-key ex-child))
-                                                           *expose-background-letter-match*
-                                                           *expose-background*)))
+        (xlib:with-gcontext
+            (gc :foreground (get-color (if (substring-equal *query-string* (expose-child-key ex-child))
+                                           *expose-foreground-letter*
+                                           *expose-foreground-letter-nok*))
+                :background (get-color (if (string-equal *query-string* (expose-child-key ex-child))
+                                           *expose-background-letter-match*
+                                           *expose-background*)))
           (xlib:draw-image-glyphs *pixmap-buffer* gc
                                   (xlib:max-char-width *expose-font*)
                                   (+ (xlib:font-ascent *expose-font*) (xlib:font-descent *expose-font*))
@@ -140,7 +141,8 @@
   (declare (ignore state))
   (when (= code 1)
     (setf *expose-selected-child*
-          (find (find-child-under-mouse x y) *expose-child-list* :test #'child-equal-p :key #'expose-child-child)))
+          (find (find-child-under-mouse x y)
+                *expose-child-list* :test #'child-equal-p :key #'expose-child-child)))
   (leave-query-mode :click))
 
 
@@ -173,7 +175,8 @@
   (let ((all-hidden-windows (get-hidden-windows)))
     (with-all-root-child (root)
       (with-all-children-reversed (root child)
-        (let ((ex-child (find child *expose-child-list* :test #'child-equal-p :key #'expose-child-child)))
+        (let ((ex-child
+               (find child *expose-child-list* :test #'child-equal-p :key #'expose-child-child)))
           (when ex-child
             (if (or (frame-p (expose-child-child ex-child))
                     (managed-window-p (expose-child-child ex-child)

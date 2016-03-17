@@ -99,7 +99,8 @@
     (when *fastswitch-msg*
       (xlib:draw-image-glyphs *pixmap-buffer* *fastswitch-gc*
                               (xlib:max-char-width *fastswitch-font*)
-                              (+ (xlib:font-ascent *fastswitch-font*) (xlib:font-descent *fastswitch-font*))
+                              (+ (xlib:font-ascent *fastswitch-font*)
+                                 (xlib:font-descent *fastswitch-font*))
                               *fastswitch-msg*))
     (xlib:with-gcontext (*fastswitch-gc* :foreground (get-color *fastswitch-foreground-letter*)
                                          :background (get-color *fastswitch-background*))
@@ -108,7 +109,8 @@
                                  (if *fastswitch-msg*
                                      (1+ (length *fastswitch-msg*))
                                      1))
-                              (+ (xlib:font-ascent *fastswitch-font*) (xlib:font-descent *fastswitch-font*))
+                              (+ (xlib:font-ascent *fastswitch-font*)
+                                 (xlib:font-descent *fastswitch-font*))
                               *fastswitch-string*))
     (display-match-child)
     (copy-pixmap-buffer *fastswitch-window* *fastswitch-gc*)))
@@ -116,7 +118,8 @@
 (defun fastswitch-draw-window-tree ()
   (let ((posy 2))
     (labels ((display-match-child (child space)
-               (let ((ex-child (find child *expose-child-list* :test #'child-equal-p :key #'expose-child-child)))
+               (let ((ex-child
+                      (find child *expose-child-list* :test #'child-equal-p :key #'expose-child-child)))
                  (when ex-child
                    (fastswitch-draw-child-name space posy ex-child)
                    (incf posy)))
@@ -130,10 +133,11 @@
                      (xlib:font-descent *fastswitch-font*) 1))))
       (clear-pixmap-buffer *fastswitch-window* *fastswitch-gc*)
       (when *fastswitch-msg*
-        (xlib:draw-image-glyphs *pixmap-buffer* *fastswitch-gc*
-                                (xlib:max-char-width *fastswitch-font*)
-                                (+ (xlib:font-ascent *fastswitch-font*) (xlib:font-descent *fastswitch-font*))
-                                *fastswitch-msg*))
+        (xlib:draw-image-glyphs
+         *pixmap-buffer* *fastswitch-gc*
+         (xlib:max-char-width *fastswitch-font*)
+         (+ (xlib:font-ascent *fastswitch-font*) (xlib:font-descent *fastswitch-font*))
+         *fastswitch-msg*))
       (xlib:with-gcontext (*fastswitch-gc* :foreground (get-color *fastswitch-foreground-letter*)
                                            :background (get-color *fastswitch-background*))
         (xlib:draw-image-glyphs *pixmap-buffer* *fastswitch-gc*
@@ -141,7 +145,8 @@
                                    (if *fastswitch-msg*
                                        (1+ (length *fastswitch-msg*))
                                        1))
-                                (+ (xlib:font-ascent *fastswitch-font*) (xlib:font-descent *fastswitch-font*))
+                                (+ (xlib:font-ascent *fastswitch-font*)
+                                   (xlib:font-descent *fastswitch-font*))
                                 *fastswitch-string*))
       (display-match-child *root-frame* 0)
       (copy-pixmap-buffer *fastswitch-window* *fastswitch-gc*))))
@@ -157,7 +162,8 @@
 (defun fastswitch-init ()
   (setf *fastswitch-font* (xlib:open-font *display* *fastswitch-font-string*)
         *fastswitch-string* ""
-        *fastswitch-match-child* (string-match *fastswitch-string* *expose-child-list* #'expose-child-key))
+        *fastswitch-match-child*
+        (string-match *fastswitch-string* *expose-child-list* #'expose-child-key))
   (let* ((width (- (screen-width) 2))
          (height (* (xlib:font-ascent *fastswitch-font*) 3)))
     (with-placement (*fastswitch-mode-placement* x y width height)
@@ -205,10 +211,12 @@
   (let ((char (keycode->char code state)))
     (when char
       (setf *fastswitch-string* (format nil "~A~A" *fastswitch-string* char)
-            *fastswitch-match-child* (string-match *fastswitch-string* *expose-child-list* #'expose-child-key))
+            *fastswitch-match-child*
+            (string-match *fastswitch-string* *expose-child-list* #'expose-child-key))
       (unless *fastswitch-match-child*
         (setf *fastswitch-string* ""
-              *fastswitch-match-child* (string-match *fastswitch-string* *expose-child-list* #'expose-child-key)))
+              *fastswitch-match-child*
+              (string-match *fastswitch-string* *expose-child-list* #'expose-child-key)))
       (fastswitch-draw-window-generic))))
 
 
