@@ -69,8 +69,8 @@
   "Return only the windows that are managed for tiling"
   (when (frame-p parent)
     (remove-if #'(lambda (x)
-		   (and (xlib:window-p x) (not (managed-window-p x parent))))
-	       (frame-child parent))))
+                   (and (xlib:window-p x) (not (managed-window-p x parent))))
+               (frame-child parent))))
 
 
 (defun next-layout-key ()
@@ -86,9 +86,9 @@
   (loop :for item :in layout-list
      :for i :from 0
      :do (typecase item
-	   (cons (add-menu-key name (first item) (second item)))
-	   (string (add-menu-comment name item))
-	   (t (add-menu-key name (number->char i) item)))))
+           (cons (add-menu-key name (first item) (second item)))
+           (string (add-menu-comment name item))
+           (t (add-menu-key name (number->char i) item)))))
 
 
 
@@ -131,27 +131,27 @@
   (when (frame-p (current-child))
     (with-slots (layout) (current-child)
       (let* ((layout-list (frame-data-slot (current-child) :fast-layout))
-	     (first-layout (ensure-function (first layout-list)))
-	     (second-layout (ensure-function (second layout-list))))
-	(setf layout (if (eql layout first-layout)
-			 second-layout
-			 first-layout))
-	(leave-second-mode)))))
+             (first-layout (ensure-function (first layout-list)))
+             (second-layout (ensure-function (second layout-list))))
+        (setf layout (if (eql layout first-layout)
+                         second-layout
+                         first-layout))
+        (leave-second-mode)))))
 
 
 (defun push-in-fast-layout-list ()
   "Push the current layout in the fast layout list"
   (when (frame-p (current-child))
     (setf (frame-data-slot (current-child) :fast-layout)
-	  (list (frame-layout (current-child))
-		(first (frame-data-slot (current-child) :fast-layout))))
+          (list (frame-layout (current-child))
+                (first (frame-data-slot (current-child) :fast-layout))))
     (leave-second-mode)))
 
 
 
 (register-layout-sub-menu 'frame-fast-layout-menu "Frame fast layout menu"
-			  '(("s" fast-layout-switch)
-			    ("p" push-in-fast-layout-list)))
+                          '(("s" fast-layout-switch)
+                            ("p" push-in-fast-layout-list)))
 
 
 ;;; No layout
@@ -161,14 +161,14 @@
 (defmethod no-layout ((child xlib:window) parent)
   (with-slots (rx ry rw rh) parent
     (values (adj-border-xy rx parent)
-	    (adj-border-xy ry parent)
-	    (adj-border-wh rw child)
-	    (adj-border-wh rh child))))
+            (adj-border-xy ry parent)
+            (adj-border-wh rw child)
+            (adj-border-wh rh child))))
 
 (defmethod no-layout ((child frame) parent)
   (values (adj-border-xy (x-fl->px (frame-x child) parent) parent)
-	  (adj-border-xy (y-fl->px (frame-y child) parent) parent)
-	  (adj-border-wh (w-fl->px (frame-w child) parent) child)
+          (adj-border-xy (y-fl->px (frame-y child) parent) parent)
+          (adj-border-wh (w-fl->px (frame-w child) parent) child)
           (adj-border-wh (h-fl->px (frame-h child) parent) child)))
 
 
@@ -196,9 +196,9 @@
 (defmethod maximize-layout (child parent)
   (with-slots (rx ry rw rh) parent
     (values (adj-border-xy rx parent)
-	    (adj-border-xy ry parent)
-	    (adj-border-wh rw child)
-	    (adj-border-wh rh child))))
+            (adj-border-xy ry parent)
+            (adj-border-wh rw child)
+            (adj-border-wh rh child))))
 
 
 (defun set-maximize-layout ()
@@ -214,8 +214,8 @@
 (defun tile-layout-ask-keep-position ()
   (when (frame-p (current-child))
     (if (query-yes-or-no "Keep frame children positions?")
-	(setf (frame-data-slot (current-child) :tile-layout-keep-position) :yes)
-	(remove-frame-data-slot (current-child) :tile-layout-keep-position))))
+        (setf (frame-data-slot (current-child) :tile-layout-keep-position) :yes)
+        (remove-frame-data-slot (current-child) :tile-layout-keep-position))))
 
 
 
@@ -239,13 +239,13 @@
 (defun update-layout-managed-children-keep-position (child parent)
   (declare (ignore child))
   (let ((managed-children (frame-data-slot parent :layout-managed-children))
-	(managed-in-parent (get-managed-child parent)))
+        (managed-in-parent (get-managed-child parent)))
     (dolist (ch managed-in-parent)
       (unless (child-member ch managed-children)
-	(setf managed-children (append managed-children (list ch)))))
+        (setf managed-children (append managed-children (list ch)))))
     (setf managed-children (remove-if-not (lambda (x)
-					    (child-member x managed-in-parent))
-					  managed-children))
+                                            (child-member x managed-in-parent))
+                                          managed-children))
     (setf (frame-data-slot parent :layout-managed-children) managed-children)
     managed-children))
 
@@ -261,22 +261,22 @@
 
 (defmethod tile-layout (child parent)
   (let* ((managed-children (update-layout-managed-children child parent))
-	 (pos (child-position child managed-children))
-	 (len (length managed-children))
-	 (nx (ceiling (sqrt len)))
-	 (ny  (ceiling (/ len nx)))
-	 (dx (/ (frame-rw parent) nx))
-	 (dy (/ (frame-rh parent) ny))
-	 (dpos (- (* nx ny) len))
-	 (width dx))
+         (pos (child-position child managed-children))
+         (len (length managed-children))
+         (nx (ceiling (sqrt len)))
+         (ny  (ceiling (/ len nx)))
+         (dx (/ (frame-rw parent) nx))
+         (dy (/ (frame-rh parent) ny))
+         (dpos (- (* nx ny) len))
+         (width dx))
     (when (plusp dpos)
       (if (zerop pos)
-	  (setf width (* dx (1+ dpos)))
-	  (incf pos dpos)))
+          (setf width (* dx (1+ dpos)))
+          (incf pos dpos)))
     (values (round (adj-border-xy (+ (frame-rx parent) (truncate (* (mod pos nx) dx))) parent))
-	    (round (adj-border-xy (+ (frame-ry parent) (truncate (* (truncate (/ pos nx)) dy))) parent))
-	    (round (adj-border-wh width child))
-	    (round (adj-border-wh dy child)))))
+            (round (adj-border-xy (+ (frame-ry parent) (truncate (* (truncate (/ pos nx)) dy))) parent))
+            (round (adj-border-wh width child))
+            (round (adj-border-wh dy child)))))
 
 (defun set-tile-layout ()
   "Tile child in its frame (vertical)"
@@ -291,22 +291,22 @@
 
 (defmethod tile-horizontal-layout (child parent)
   (let* ((managed-children (update-layout-managed-children child parent))
-	 (pos (child-position child managed-children))
-	 (len (length managed-children))
-	 (ny (ceiling (sqrt len)))
-	 (nx (ceiling (/ len ny)))
-	 (dx (/ (frame-rw parent) nx))
-	 (dy (/ (frame-rh parent) ny))
-	 (dpos (- (* nx ny) len))
-	 (height dy))
+         (pos (child-position child managed-children))
+         (len (length managed-children))
+         (ny (ceiling (sqrt len)))
+         (nx (ceiling (/ len ny)))
+         (dx (/ (frame-rw parent) nx))
+         (dy (/ (frame-rh parent) ny))
+         (dpos (- (* nx ny) len))
+         (height dy))
     (when (plusp dpos)
       (if (zerop pos)
-	  (setf height (* dy (1+ dpos)))
-	  (incf pos dpos)))
+          (setf height (* dy (1+ dpos)))
+          (incf pos dpos)))
     (values (round (adj-border-xy (+ (frame-rx parent) (truncate (* (truncate (/ pos ny)) dx))) parent))
-	    (round (adj-border-xy (+ (frame-ry parent) (truncate (* (mod pos ny) dy))) parent))
-	    (round (adj-border-wh dx child))
-	    (round (adj-border-wh height child)))))
+            (round (adj-border-xy (+ (frame-ry parent) (truncate (* (mod pos ny) dy))) parent))
+            (round (adj-border-wh dx child))
+            (round (adj-border-wh height child)))))
 
 (defun set-tile-horizontal-layout ()
   "Tile child in its frame (horizontal)"
@@ -356,13 +356,13 @@
 
 (defmethod one-column-layout (child parent)
   (let* ((managed-children (update-layout-managed-children child parent))
-	 (pos (child-position child managed-children))
-	 (len (length managed-children))
-	 (dy (/ (frame-rh parent) len)))
+         (pos (child-position child managed-children))
+         (len (length managed-children))
+         (dy (/ (frame-rh parent) len)))
     (values (round (adj-border-xy (frame-rx parent) parent))
-	    (round (adj-border-xy (+ (frame-ry parent) (*  pos dy)) parent))
-	    (round (adj-border-wh (frame-rw parent) child))
-	    (round (adj-border-wh dy child)))))
+            (round (adj-border-xy (+ (frame-ry parent) (*  pos dy)) parent))
+            (round (adj-border-wh (frame-rw parent) child))
+            (round (adj-border-wh dy child)))))
 
 (defun set-one-column-layout ()
   "One column layout"
@@ -376,13 +376,13 @@
 
 (defmethod one-line-layout (child parent)
   (let* ((managed-children (update-layout-managed-children child parent))
-	 (pos (child-position child managed-children))
-	 (len (length managed-children))
-	 (dx (/ (frame-rw parent) len)))
+         (pos (child-position child managed-children))
+         (len (length managed-children))
+         (dx (/ (frame-rw parent) len)))
     (values (round (adj-border-xy (+ (frame-rx parent) (*  pos dx)) parent))
-	    (round (adj-border-xy (frame-ry parent) parent))
-	    (round (adj-border-wh dx child))
-	    (round (adj-border-wh (frame-rh parent) child)))))
+            (round (adj-border-xy (frame-ry parent) parent))
+            (round (adj-border-wh dx child))
+            (round (adj-border-wh (frame-rh parent) child)))))
 
 (defun set-one-line-layout ()
   "One line layout"
@@ -464,12 +464,12 @@
 
 
 (register-layout-sub-menu 'frame-tile-layout-menu "Frame tile layout menu"
-			  '(("v" set-tile-layout)
-			    ("h" set-tile-horizontal-layout)
+                          '(("v" set-tile-layout)
+                            ("h" set-tile-horizontal-layout)
                             ("m" set-tile-layout-mix)
-			    ("c" set-one-column-layout)
-			    ("l" set-one-line-layout)
-			    ("s" set-tile-space-layout)
+                            ("c" set-one-column-layout)
+                            ("l" set-one-line-layout)
+                            ("s" set-tile-space-layout)
                             ("t" set-three-columns-layout)))
 
 
@@ -479,21 +479,21 @@
   "Tile Left: main child on left and others on right"
   (with-slots (rx ry rw rh) parent
     (let* ((managed-children (update-layout-managed-children child parent))
-	   (pos (child-position child managed-children))
-	   (len (max (1- (length managed-children)) 1))
-	   (dy (/ rh len))
-	   (size (or (frame-data-slot parent :tile-size) 0.8)))
+           (pos (child-position child managed-children))
+           (len (max (1- (length managed-children)) 1))
+           (dy (/ rh len))
+           (size (or (frame-data-slot parent :tile-size) 0.8)))
       (if (> (length managed-children) 1)
-	  (if (= pos 0)
-	      (values (adj-border-xy rx parent)
-		      (adj-border-xy ry parent)
-		      (adj-border-wh (round (* rw size)) child)
-		      (adj-border-wh rh child))
-	      (values (adj-border-xy (round (+ rx (* rw size))) parent)
-		      (adj-border-xy (round (+ ry (* dy (1- pos)))) parent)
-		      (adj-border-wh (round (* rw (- 1 size))) child)
-		      (adj-border-wh (round dy) child)))
-	  (no-layout child parent)))))
+          (if (= pos 0)
+              (values (adj-border-xy rx parent)
+                      (adj-border-xy ry parent)
+                      (adj-border-wh (round (* rw size)) child)
+                      (adj-border-wh rh child))
+              (values (adj-border-xy (round (+ rx (* rw size))) parent)
+                      (adj-border-xy (round (+ ry (* dy (1- pos)))) parent)
+                      (adj-border-wh (round (* rw (- 1 size))) child)
+                      (adj-border-wh (round dy) child)))
+          (no-layout child parent)))))
 
 
 (defun set-tile-left-layout ()
@@ -509,21 +509,21 @@
   "Tile Right: main child on right and others on left"
   (with-slots (rx ry rw rh) parent
     (let* ((managed-children (update-layout-managed-children child parent))
-	   (pos (child-position child managed-children))
-	   (len (max (1- (length managed-children)) 1))
-	   (dy (/ rh len))
-	   (size (or (frame-data-slot parent :tile-size) 0.8)))
+           (pos (child-position child managed-children))
+           (len (max (1- (length managed-children)) 1))
+           (dy (/ rh len))
+           (size (or (frame-data-slot parent :tile-size) 0.8)))
       (if (> (length managed-children) 1)
-	  (if (= pos 0)
-	      (values (adj-border-xy (round (+ rx (* rw (- 1 size)))) parent)
-		      (adj-border-xy ry parent)
-		      (adj-border-wh (round (* rw size)) child)
-		      (adj-border-wh rh child))
-	      (values (adj-border-xy rx parent)
-		      (adj-border-xy (round (+ ry (* dy (1- pos)))) parent)
-		      (adj-border-wh (round (* rw (- 1 size))) child)
-		      (adj-border-wh (round dy) child)))
-	  (no-layout child parent)))))
+          (if (= pos 0)
+              (values (adj-border-xy (round (+ rx (* rw (- 1 size)))) parent)
+                      (adj-border-xy ry parent)
+                      (adj-border-wh (round (* rw size)) child)
+                      (adj-border-wh rh child))
+              (values (adj-border-xy rx parent)
+                      (adj-border-xy (round (+ ry (* dy (1- pos)))) parent)
+                      (adj-border-wh (round (* rw (- 1 size))) child)
+                      (adj-border-wh (round dy) child)))
+          (no-layout child parent)))))
 
 
 (defun set-tile-right-layout ()
@@ -542,21 +542,21 @@
   "Tile Top: main child on top and others on bottom"
   (with-slots (rx ry rw rh) parent
     (let* ((managed-children (update-layout-managed-children child parent))
-	   (pos (child-position child managed-children))
-	   (len (max (1- (length managed-children)) 1))
-	   (dx (/ rw len))
-	   (size (or (frame-data-slot parent :tile-size) 0.8)))
+           (pos (child-position child managed-children))
+           (len (max (1- (length managed-children)) 1))
+           (dx (/ rw len))
+           (size (or (frame-data-slot parent :tile-size) 0.8)))
       (if (> (length managed-children) 1)
-	  (if (= pos 0)
-	      (values (adj-border-xy rx parent)
-		      (adj-border-xy ry parent)
-		      (adj-border-wh rw child)
-		      (adj-border-wh (round (* rh size)) child))
-	      (values (adj-border-xy (round (+ rx (* dx (1- pos)))) parent)
-		      (adj-border-xy (round (+ ry (* rh size))) parent)
-		      (adj-border-wh (round dx) child)
-		      (adj-border-wh (round (* rh (- 1 size))) child)))
-	  (no-layout child parent)))))
+          (if (= pos 0)
+              (values (adj-border-xy rx parent)
+                      (adj-border-xy ry parent)
+                      (adj-border-wh rw child)
+                      (adj-border-wh (round (* rh size)) child))
+              (values (adj-border-xy (round (+ rx (* dx (1- pos)))) parent)
+                      (adj-border-xy (round (+ ry (* rh size))) parent)
+                      (adj-border-wh (round dx) child)
+                      (adj-border-wh (round (* rh (- 1 size))) child)))
+          (no-layout child parent)))))
 
 
 (defun set-tile-top-layout ()
@@ -573,21 +573,21 @@
   "Tile Bottom: main child on bottom and others on top"
   (with-slots (rx ry rw rh) parent
     (let* ((managed-children (update-layout-managed-children child parent))
-	   (pos (child-position child managed-children))
-	   (len (max (1- (length managed-children)) 1))
-	   (dx (/ rw len))
-	   (size (or (frame-data-slot parent :tile-size) 0.8)))
+           (pos (child-position child managed-children))
+           (len (max (1- (length managed-children)) 1))
+           (dx (/ rw len))
+           (size (or (frame-data-slot parent :tile-size) 0.8)))
       (if (> (length managed-children) 1)
-	  (if (= pos 0)
-	      (values (adj-border-xy rx parent)
-		      (adj-border-xy (round (+ ry (* rh (- 1 size)))) parent)
-		      (adj-border-wh rw child)
-		      (adj-border-wh (round (* rh size)) child))
-	      (values (adj-border-xy (round (+ rx (* dx (1- pos)))) parent)
-		      (adj-border-xy ry parent)
-		      (adj-border-wh (round dx) child)
-		      (adj-border-wh (round (* rh (- 1 size))) child)))
-	  (no-layout child parent)))))
+          (if (= pos 0)
+              (values (adj-border-xy rx parent)
+                      (adj-border-xy (round (+ ry (* rh (- 1 size)))) parent)
+                      (adj-border-wh rw child)
+                      (adj-border-wh (round (* rh size)) child))
+              (values (adj-border-xy (round (+ rx (* dx (1- pos)))) parent)
+                      (adj-border-xy ry parent)
+                      (adj-border-wh (round dx) child)
+                      (adj-border-wh (round (* rh (- 1 size))) child)))
+          (no-layout child parent)))))
 
 
 
@@ -599,10 +599,10 @@
 
 
 (register-layout-sub-menu 'frame-tile-dir-layout-menu "Tile in one direction layout menu"
-			  '(("l" set-tile-left-layout)
-			    ("r" set-tile-right-layout)
-			    ("t" set-tile-top-layout)
-			    ("b" set-tile-bottom-layout)))
+                          '(("l" set-tile-left-layout)
+                            ("r" set-tile-right-layout)
+                            ("t" set-tile-top-layout)
+                            ("b" set-tile-bottom-layout)))
 
 
 
@@ -620,27 +620,27 @@
   "Tile Left Space: main child on left and others on right. Leave some space (in pixels) on the left."
   (with-slots (rx ry rw rh) parent
     (let* ((managed-children (update-layout-managed-children child parent))
-	   (pos (child-position child managed-children))
-	   (len (max (1- (length managed-children)) 1))
-	   (dy (/ rh len))
-	   (size (or (frame-data-slot parent :tile-size) 0.8))
-	   (space (or (frame-data-slot parent :tile-left-space) 100)))
+           (pos (child-position child managed-children))
+           (len (max (1- (length managed-children)) 1))
+           (dy (/ rh len))
+           (size (or (frame-data-slot parent :tile-size) 0.8))
+           (space (or (frame-data-slot parent :tile-left-space) 100)))
       (if (> (length managed-children) 1)
-	  (if (= pos 0)
-	      (values (adj-border-xy (+ rx space) parent)
-		      (adj-border-xy ry parent)
-		      (adj-border-wh (- (round (* rw size)) space) child)
-		      (adj-border-wh rh child))
-	      (values (adj-border-xy (round (+ rx (* rw size))) parent)
-		      (adj-border-xy (round (+ ry (* dy (1- pos)))) parent)
-		      (adj-border-wh (round (* rw (- 1 size))) child)
-		      (adj-border-wh (round dy) child)))
-	  (multiple-value-bind (rnx rny rnw rnh)
-	      (no-layout child parent)
-	    (values (+ rnx space)
-		    rny
-		    (- rnw space)
-		    rnh))))))
+          (if (= pos 0)
+              (values (adj-border-xy (+ rx space) parent)
+                      (adj-border-xy ry parent)
+                      (adj-border-wh (- (round (* rw size)) space) child)
+                      (adj-border-wh rh child))
+              (values (adj-border-xy (round (+ rx (* rw size))) parent)
+                      (adj-border-xy (round (+ ry (* dy (1- pos)))) parent)
+                      (adj-border-wh (round (* rw (- 1 size))) child)
+                      (adj-border-wh (round dy) child)))
+          (multiple-value-bind (rnx rny rnw rnh)
+              (no-layout child parent)
+            (values (+ rnx space)
+                    rny
+                    (- rnw space)
+                    rnh))))))
 
 
 (defun set-tile-left-space-layout ()
@@ -651,7 +651,7 @@
   (set-layout #'tile-left-space-layout))
 
 (register-layout-sub-menu 'frame-tile-space-layout-menu "Tile with some space on one side menu"
-			  '(set-tile-left-space-layout))
+                          '(set-tile-left-space-layout))
 
 
 
@@ -663,21 +663,21 @@
   "Main window right: Main windows on the right. Others on the left."
   (with-slots (rx ry rw rh) parent
     (let* ((main-windows (frame-data-slot parent :main-window-list))
-	   (len (length main-windows))
-	   (size (or (frame-data-slot parent :tile-size) 0.8)))
+           (len (length main-windows))
+           (size (or (frame-data-slot parent :tile-size) 0.8)))
       (if (zerop len)
-	  (no-layout child parent)
-	  (if (child-member child main-windows)
-	      (let* ((dy (/ rh len))
-		     (pos (child-position child main-windows)))
-		(values (adj-border-xy (round (+ rx (* rw (- 1 size)))) parent)
-			(adj-border-xy (round (+ ry (* dy pos))) parent)
-			(adj-border-wh (round (* rw size)) child)
-			(adj-border-wh (round dy) child)))
-	      (values (adj-border-xy rx parent)
-		      (adj-border-xy ry parent)
-		      (adj-border-wh (round (* rw (- 1 size))) child)
-		      (adj-border-wh rh child)))))))
+          (no-layout child parent)
+          (if (child-member child main-windows)
+              (let* ((dy (/ rh len))
+                     (pos (child-position child main-windows)))
+                (values (adj-border-xy (round (+ rx (* rw (- 1 size)))) parent)
+                        (adj-border-xy (round (+ ry (* dy pos))) parent)
+                        (adj-border-wh (round (* rw size)) child)
+                        (adj-border-wh (round dy) child)))
+              (values (adj-border-xy rx parent)
+                      (adj-border-xy ry parent)
+                      (adj-border-wh (round (* rw (- 1 size))) child)
+                      (adj-border-wh rh child)))))))
 
 (defun set-main-window-right-layout ()
   "Main window right: Main windows on the right. Others on the left."
@@ -691,21 +691,21 @@
   "Main window left: Main windows on the left. Others on the right."
   (with-slots (rx ry rw rh) parent
     (let* ((main-windows (frame-data-slot parent :main-window-list))
-	   (len (length main-windows))
-	   (size (or (frame-data-slot parent :tile-size) 0.8)))
+           (len (length main-windows))
+           (size (or (frame-data-slot parent :tile-size) 0.8)))
       (if (zerop len)
-	  (no-layout child parent)
-	  (if (child-member child main-windows)
-	      (let* ((dy (/ rh len))
-		     (pos (child-position child main-windows)))
-		(values (adj-border-xy rx parent)
-			(adj-border-xy (round (+ ry (* dy pos))) parent)
-			(adj-border-wh (round (* rw size)) child)
-			(adj-border-wh (round dy) child)))
-	      (values (adj-border-xy (round (+ rx (* rw size))) parent)
-		      (adj-border-xy ry parent)
-		      (adj-border-wh (round (* rw (- 1 size))) child)
-		      (adj-border-wh rh child)))))))
+          (no-layout child parent)
+          (if (child-member child main-windows)
+              (let* ((dy (/ rh len))
+                     (pos (child-position child main-windows)))
+                (values (adj-border-xy rx parent)
+                        (adj-border-xy (round (+ ry (* dy pos))) parent)
+                        (adj-border-wh (round (* rw size)) child)
+                        (adj-border-wh (round dy) child)))
+              (values (adj-border-xy (round (+ rx (* rw size))) parent)
+                      (adj-border-xy ry parent)
+                      (adj-border-wh (round (* rw (- 1 size))) child)
+                      (adj-border-wh rh child)))))))
 
 (defun set-main-window-left-layout ()
   "Main window left: Main windows on the left. Others on the right."
@@ -718,21 +718,21 @@
   "Main window top: Main windows on the top. Others on the bottom."
   (with-slots (rx ry rw rh) parent
     (let* ((main-windows (frame-data-slot parent :main-window-list))
-	   (len (length main-windows))
-	   (size (or (frame-data-slot parent :tile-size) 0.8)))
+           (len (length main-windows))
+           (size (or (frame-data-slot parent :tile-size) 0.8)))
       (if (zerop len)
-	  (no-layout child parent)
-	  (if (child-member child main-windows)
-	      (let* ((dx (/ rw len))
-		     (pos (child-position child main-windows)))
-		(values (adj-border-xy (round (+ rx (* dx pos))) parent)
-			(adj-border-xy ry parent)
-			(adj-border-wh (round dx) child)
-			(adj-border-wh (round (* rh size)) child)))
-	      (values (adj-border-xy rx parent)
-		      (adj-border-xy (round (+ ry (* rh size))) parent)
-		      (adj-border-wh rw child)
-		      (adj-border-wh (round (* rh (- 1 size))) child)))))))
+          (no-layout child parent)
+          (if (child-member child main-windows)
+              (let* ((dx (/ rw len))
+                     (pos (child-position child main-windows)))
+                (values (adj-border-xy (round (+ rx (* dx pos))) parent)
+                        (adj-border-xy ry parent)
+                        (adj-border-wh (round dx) child)
+                        (adj-border-wh (round (* rh size)) child)))
+              (values (adj-border-xy rx parent)
+                      (adj-border-xy (round (+ ry (* rh size))) parent)
+                      (adj-border-wh rw child)
+                      (adj-border-wh (round (* rh (- 1 size))) child)))))))
 
 (defun set-main-window-top-layout ()
   "Main window top: Main windows on the top. Others on the bottom."
@@ -745,21 +745,21 @@
   "Main window bottom: Main windows on the bottom. Others on the top."
   (with-slots (rx ry rw rh) parent
     (let* ((main-windows (frame-data-slot parent :main-window-list))
-	   (len (length main-windows))
-	   (size (or (frame-data-slot parent :tile-size) 0.8)))
+           (len (length main-windows))
+           (size (or (frame-data-slot parent :tile-size) 0.8)))
       (if (zerop len)
-	  (no-layout child parent)
-	  (if (child-member child main-windows)
-	      (let* ((dx (/ rw len))
-		     (pos (child-position child main-windows)))
-		(values (adj-border-xy (round (+ rx (* dx pos))) parent)
-			(adj-border-xy (round (+ ry (* rh (- 1 size)))) parent)
-			(adj-border-wh (round dx) child)
-			(adj-border-wh (round (* rh size)) child)))
-	      (values (adj-border-xy rx parent)
-		      (adj-border-xy ry parent)
-		      (adj-border-wh rw child)
-		      (adj-border-wh (round (* rh (- 1 size))) child)))))))
+          (no-layout child parent)
+          (if (child-member child main-windows)
+              (let* ((dx (/ rw len))
+                     (pos (child-position child main-windows)))
+                (values (adj-border-xy (round (+ rx (* dx pos))) parent)
+                        (adj-border-xy (round (+ ry (* rh (- 1 size)))) parent)
+                        (adj-border-wh (round dx) child)
+                        (adj-border-wh (round (* rh size)) child)))
+              (values (adj-border-xy rx parent)
+                      (adj-border-xy ry parent)
+                      (adj-border-wh rw child)
+                      (adj-border-wh (round (* rh (- 1 size))) child)))))))
 
 (defun set-main-window-bottom-layout ()
   "Main window bottom: Main windows on the bottom. Others on the top."
@@ -775,7 +775,7 @@
   (when (frame-p (current-child))
     (with-current-window
       (when (child-member window (get-managed-child (current-child)))
-	(pushnew window (frame-data-slot (current-child) :main-window-list)))))
+        (pushnew window (frame-data-slot (current-child) :main-window-list)))))
   (leave-second-mode))
 
 
@@ -784,8 +784,8 @@
   (when (frame-p (current-child))
     (with-current-window
       (when (child-member window (get-managed-child (current-child)))
-	(setf (frame-data-slot (current-child) :main-window-list)
-	      (child-remove window (frame-data-slot (current-child) :main-window-list))))))
+        (setf (frame-data-slot (current-child) :main-window-list)
+              (child-remove window (frame-data-slot (current-child) :main-window-list))))))
   (leave-second-mode))
 
 (defun clear-main-window-list ()
@@ -798,14 +798,14 @@
 
 
 (register-layout-sub-menu 'frame-main-window-layout-menu "Main window layout menu"
-			  '(("r" set-main-window-right-layout)
-			    ("l" set-main-window-left-layout)
-			    ("t" set-main-window-top-layout)
-			    ("b" set-main-window-bottom-layout)
-			    "-=- Actions on main windows list -=-"
-			    ("a" add-in-main-window-list)
-			    ("v" remove-in-main-window-list)
-			    ("c" clear-main-window-list)))
+                          '(("r" set-main-window-right-layout)
+                            ("l" set-main-window-left-layout)
+                            ("t" set-main-window-top-layout)
+                            ("b" set-main-window-bottom-layout)
+                            "-=- Actions on main windows list -=-"
+                            ("a" add-in-main-window-list)
+                            ("v" remove-in-main-window-list)
+                            ("c" clear-main-window-list)))
 
 
 ;;; GIMP layout specifics functions
@@ -819,16 +819,16 @@
   (when (frame-p (current-child))
     (with-slots (child) (current-child)
       (let* ((main-windows (frame-data-slot (current-child) :main-window-list))
-	     (to-skip? (not (= (length main-windows)
-			       (length child)))))
-	(labels ((rec ()
-		   (setf child (funcall fun-rotate child))
-		   (when (and to-skip?
-			      (child-member (frame-selected-child (current-child)) main-windows))
-		     (rec))))
-	  (unselect-all-frames)
-	  (rec)
-	  (show-all-children))))))
+             (to-skip? (not (= (length main-windows)
+                               (length child)))))
+        (labels ((rec ()
+                   (setf child (funcall fun-rotate child))
+                   (when (and to-skip?
+                              (child-member (frame-selected-child (current-child)) main-windows))
+                     (rec))))
+          (unselect-all-frames)
+          (rec)
+          (show-all-children))))))
 
 
 (defun select-next-child-no-main-window ()
@@ -845,9 +845,9 @@
 Or do actions on corners - Skip windows in main window list"
   (unless (do-corner-action root-x root-y *corner-main-mode-left-button*)
     (if (and (frame-p (current-child))
-	     (child-member window (frame-data-slot (current-child) :main-window-list)))
-	(replay-button-event)
-	(mouse-click-to-focus-generic window root-x root-y #'move-frame))))
+             (child-member window (frame-data-slot (current-child) :main-window-list)))
+        (replay-button-event)
+        (mouse-click-to-focus-generic window root-x root-y #'move-frame))))
 
 
 
@@ -899,24 +899,24 @@ Or do actions on corners - Skip windows in main window list"
   (define-main-key ("Tab" :mod-1 :shift) 'select-previous-child)
   (define-main-mouse (1) 'mouse-click-to-focus-and-move)
   (setf (frame-focus-policy (current-child))
-	(frame-data-slot (current-child) :focus-policy-save))
+        (frame-data-slot (current-child) :focus-policy-save))
   (setf (frame-layout (current-child))
-	(frame-data-slot (current-child) :layout-save))
+        (frame-data-slot (current-child) :layout-save))
   (leave-second-mode))
 
 
 
 
 (register-layout-sub-menu 'frame-gimp-layout-menu "The GIMP layout menu"
-			  '(("g" set-gimp-layout)
-			    ("p" set-previous-layout)
-			    ("h" help-on-gimp-layout)
-			    "-=- Main window layout -=-"
-			    ("r" set-main-window-right-layout)
-			    ("l" set-main-window-left-layout)
-			    ("t" set-main-window-top-layout)
-			    ("b" set-main-window-bottom-layout)
-			    "-=- Actions on main windows list -=-"
-			    ("a" add-in-main-window-list)
-			    ("v" remove-in-main-window-list)
-			    ("c" clear-main-window-list)))
+                          '(("g" set-gimp-layout)
+                            ("p" set-previous-layout)
+                            ("h" help-on-gimp-layout)
+                            "-=- Main window layout -=-"
+                            ("r" set-main-window-right-layout)
+                            ("l" set-main-window-left-layout)
+                            ("t" set-main-window-top-layout)
+                            ("b" set-main-window-bottom-layout)
+                            "-=- Actions on main windows list -=-"
+                            ("a" add-in-main-window-list)
+                            ("v" remove-in-main-window-list)
+                            ("c" clear-main-window-list)))

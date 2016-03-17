@@ -27,11 +27,11 @@
 
 (defpackage clfswm
   (:use :common-lisp :my-html :tools :version)
-;;  (:shadow :defun)
+  ;;  (:shadow :defun)
   (:export :main
-	   :reload-clfswm
-	   :reset-clfswm
-	   :exit-clfswm))
+           :reload-clfswm
+           :reset-clfswm
+           :exit-clfswm))
 
 
 ;;;;; Uncomment the line below if you want to see all ignored X errors
@@ -66,10 +66,10 @@ It is particulary useful with CLISP/MIT-CLX.")
 
 
 (defparameter *modifier-alias* '((:alt :mod-1)     (:alt-l :mod-1)
-				 (:numlock :mod-2)
-				 (:super_l :mod-4)
-				 (:alt-r :mod-5)   (:alt-gr :mod-5)
-				 (:capslock :lock))
+                                 (:numlock :mod-2)
+                                 (:super_l :mod-4)
+                                 (:alt-r :mod-5)   (:alt-gr :mod-5)
+                                 (:capslock :lock))
   "Syntax: (modifier-alias effective-modifier)")
 
 
@@ -107,9 +107,9 @@ It is particulary useful with CLISP/MIT-CLX.")
 
 ;;; CONFIG - Default frame datas
 (defconfig *default-frame-data*
-  (list '(:tile-size 0.8) '(:tile-space-size 0.1)
-	'(:fast-layout (tile-left-layout tile-layout))
-	'(:main-layout-windows nil))
+    (list '(:tile-size 0.8) '(:tile-space-size 0.1)
+          '(:fast-layout (tile-left-layout tile-layout))
+          '(:main-layout-windows nil))
   nil
   "Default slots set in frame date")
 
@@ -117,7 +117,7 @@ It is particulary useful with CLISP/MIT-CLX.")
 ;;; CONFIG - Default managed window type for a frame
 ;;; type can be  :all, :normal, :transient, :maxsize, :desktop, :dock, :toolbar, :menu, :utility, :splash, :dialog
 (defconfig *default-managed-type* '(:normal) nil
-  "Default managed window types")
+           "Default managed window types")
 ;;(defparameter *default-managed-type* '(:normal :maxsize :transient))
 ;;(defparameter *default-managed-type* '(:normal :transient :maxsize :desktop :dock :toolbar :menu :utility :splash :dialog))
 ;;(defparameter *default-managed-type* '())
@@ -156,36 +156,36 @@ It is particulary useful with CLISP/MIT-CLX.")
    (ry :initarg :ry :accessor frame-ry :initform 0)
    (rw :initarg :rw :accessor frame-rw :initform 800)
    (rh :initarg :rh :accessor frame-rh :initform 600)
-;;   (root :initarg :root :accessor frame-root :initform nil
-;;         :documentation "A list a physical coordinates (x y w h) if frame is a root frame. Nil otherwise")
+   ;;   (root :initarg :root :accessor frame-root :initform nil
+   ;;         :documentation "A list a physical coordinates (x y w h) if frame is a root frame. Nil otherwise")
    (layout :initarg :layout :accessor frame-layout :initform nil
-	   :documentation "Layout to display windows on a frame")
+           :documentation "Layout to display windows on a frame")
    (nw-hook :initarg :nw-hook :accessor frame-nw-hook :initform nil
-	    :documentation "Hook done by the frame when a new window is mapped")
+            :documentation "Hook done by the frame when a new window is mapped")
    (managed-type :initarg :managed-type :accessor frame-managed-type
-		 :initform *default-managed-type*
-		 :documentation "Managed window type")
+                 :initform *default-managed-type*
+                 :documentation "Managed window type")
    (forced-managed-window :initarg :forced-managed-window
-			  :accessor frame-forced-managed-window
-			  :initform nil
-			  :documentation "A list of forced managed windows (xlib:wm-name or window)")
+                          :accessor frame-forced-managed-window
+                          :initform nil
+                          :documentation "A list of forced managed windows (xlib:wm-name or window)")
    (forced-unmanaged-window :initarg :forced-unmanaged-window
-			  :accessor frame-forced-unmanaged-window
-			  :initform nil
-			  :documentation "A list of forced unmanaged windows (xlib:wm-name or window)")
+                            :accessor frame-forced-unmanaged-window
+                            :initform nil
+                            :documentation "A list of forced unmanaged windows (xlib:wm-name or window)")
    (show-window-p :initarg :show-window-p :accessor frame-show-window-p :initform t)
    (hidden-children :initarg :hidden-children :accessor frame-hidden-children :initform nil
-		    :documentation "A list of hidden children")
+                    :documentation "A list of hidden children")
    (selected-pos :initarg :selected-pos :accessor frame-selected-pos :initform 0
-		 :documentation "The position in the child list of the selected child")
+                 :documentation "The position in the child list of the selected child")
    (focus-policy :initarg :focus-policy :accessor frame-focus-policy
-		 :initform *default-focus-policy*)
+                 :initform *default-focus-policy*)
    (window :initarg :window :accessor frame-window :initform nil)
    (gc :initarg :gc :accessor frame-gc :initform nil)
    (child :initarg :child :accessor frame-child :initform nil)
    (data :initarg :data :accessor frame-data
-	 :initform *default-frame-data*
-	 :documentation "An assoc list to store additional data")))
+         :initform *default-frame-data*
+         :documentation "An assoc list to store additional data")))
 
 
 
@@ -279,13 +279,13 @@ loading configuration file and before opening the display.")
 ;;    (force-output)
 ;;    (cl:defun ,name ,args
 ;;      (handler-case
-;;	  (progn
-;;	    ,@body)
-;;	(error (c)
-;;	  (format t "New defun: Error in ~A : ~A~%" ',name c)
-;;	  (format t "Root tree=~A~%All windows=~A~%"
-;;		  (xlib:query-tree *root*) (get-all-windows))
-;;	  (force-output))))))
+;;    (progn
+;;      ,@body)
+;;  (error (c)
+;;    (format t "New defun: Error in ~A : ~A~%" ',name c)
+;;    (format t "Root tree=~A~%All windows=~A~%"
+;;      (xlib:query-tree *root*) (get-all-windows))
+;;    (force-output))))))
 
 
 

@@ -34,11 +34,11 @@
   (raise-window *sm-window*)
   (clear-pixmap-buffer *sm-window* *sm-gc*)
   (let* ((text (format nil "Second mode"))
-	 (len (length text)))
+         (len (length text)))
     (xlib:draw-glyphs *pixmap-buffer* *sm-gc*
-		      (truncate (/ (- *sm-width* (* (xlib:max-char-width *sm-font*) len)) 2))
-		      (truncate (/ (+ *sm-height* (- (xlib:font-ascent *sm-font*) (xlib:font-descent *sm-font*))) 2))
-		      text))
+                      (truncate (/ (- *sm-width* (* (xlib:max-char-width *sm-font*) len)) 2))
+                      (truncate (/ (+ *sm-height* (- (xlib:font-ascent *sm-font*) (xlib:font-descent *sm-font*))) 2))
+                      text))
   (copy-pixmap-buffer *sm-window* *sm-gc*)
   (no-focus))
 
@@ -56,8 +56,8 @@
 (define-handler second-mode :motion-notify (window root-x root-y)
   (unless (compress-motion-notify)
     (funcall-button-from-code *second-mouse* 'motion
-			      (modifiers->state *default-modifiers*)
-			      window root-x root-y *fun-press*)))
+                              (modifiers->state *default-modifiers*)
+                              window root-x root-y *fun-press*)))
 
 (define-handler second-mode :button-press (window root-x root-y code state)
   (funcall-button-from-code *second-mouse* code state window root-x root-y *fun-press*)
@@ -98,20 +98,20 @@
 (defun sm-enter-function ()
   (with-placement (*second-mode-placement* x y *sm-width* *sm-height*)
     (setf *in-second-mode* t
-	  *sm-window* (xlib:create-window :parent *root*
-					  :x x :y y
-					  :width *sm-width* :height *sm-height*
-					  :background (get-color *sm-background-color*)
-					  :border-width *border-size*
-					  :border (get-color *sm-border-color*)
-					  :colormap (xlib:screen-default-colormap *screen*)
-					  :event-mask '(:exposure))
-	  *sm-font* (xlib:open-font *display* *sm-font-string*)
-	  *sm-gc* (xlib:create-gcontext :drawable *sm-window*
-					:foreground (get-color *sm-foreground-color*)
-					:background (get-color *sm-background-color*)
-					:font *sm-font*
-					:line-style :solid)))
+          *sm-window* (xlib:create-window :parent *root*
+                                          :x x :y y
+                                          :width *sm-width* :height *sm-height*
+                                          :background (get-color *sm-background-color*)
+                                          :border-width *border-size*
+                                          :border (get-color *sm-border-color*)
+                                          :colormap (xlib:screen-default-colormap *screen*)
+                                          :event-mask '(:exposure))
+          *sm-font* (xlib:open-font *display* *sm-font-string*)
+          *sm-gc* (xlib:create-gcontext :drawable *sm-window*
+                                        :foreground (get-color *sm-foreground-color*)
+                                        :background (get-color *sm-background-color*)
+                                        :font *sm-font*
+                                        :line-style :solid)))
   (setf (window-transparency *sm-window*) *sm-transparency*)
   (map-window *sm-window*)
   (draw-second-mode-window)
@@ -146,10 +146,10 @@
 (defun second-key-mode ()
   "Switch to editing mode (second mode)"
   (generic-mode 'second-mode
-		'exit-second-loop
-		:enter-function #'sm-enter-function
-		:loop-function #'sm-loop-function
-		:leave-function #'sm-leave-function)
+                'exit-second-loop
+                :enter-function #'sm-enter-function
+                :loop-function #'sm-loop-function
+                :leave-function #'sm-leave-function)
   (when *second-mode-leave-function*
     (funcall *second-mode-leave-function*)
     (setf *second-mode-leave-function* nil)))
@@ -157,10 +157,10 @@
 (defun leave-second-mode ()
   "Leave second mode"
   (cond (*in-second-mode*
-	 (setf *in-second-mode* nil)
-	 (throw 'exit-second-loop nil))
-	(t (setf *in-second-mode* nil)
-	   (show-all-children))))
+         (setf *in-second-mode* nil)
+         (throw 'exit-second-loop nil))
+        (t (setf *in-second-mode* nil)
+           (show-all-children))))
 
 
 (defun sm-delete-focus-window ()

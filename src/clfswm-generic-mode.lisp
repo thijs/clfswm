@@ -26,7 +26,7 @@
 (in-package :clfswm)
 
 (defun generic-mode (mode exit-tag &key enter-function loop-function leave-function
-                     (loop-hook *loop-hook*) original-mode)
+                                     (loop-hook *loop-hook*) original-mode)
   "Enter in a generic mode"
   (let ((last-mode *current-event-mode*))
     (unwind-protect

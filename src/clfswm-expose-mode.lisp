@@ -52,15 +52,15 @@
 (defun expose-associate-keys ()
   (let* ((all nil)
          (new nil)
-	 (all-numbers (loop for ec in *expose-child-list*
-			 collect (expose-child-number ec))))
+         (all-numbers (loop for ec in *expose-child-list*
+                         collect (expose-child-number ec))))
     (with-all-children-reversed (*root-frame* child)
       (unless (child-equal-p child *root-frame*)
         (push child all)
         (unless (member child *expose-child-list* :test #'child-equal-p :key #'expose-child-child)
-	  (let ((number (find-free-number all-numbers)))
-	    (push (make-expose-child :child child :number number :key (number->letter number)) new)
-	    (push number all-numbers)))))
+          (let ((number (find-free-number all-numbers)))
+            (push (make-expose-child :child child :number number :key (number->letter number)) new)
+            (push number all-numbers)))))
     (append (remove-if-not (lambda (x) (member x all :test #'child-equal-p)) *expose-child-list*
                            :key #'expose-child-child)
             (nreverse new))))
@@ -131,8 +131,8 @@
   (declare (ignore code state))
   (expose-draw-letter)
   (let ((two-letters-key (dolist (child *expose-child-list*)
-			   (when (> (length (expose-child-key child)) 1)
-			     (return t)))))
+                           (when (> (length (expose-child-key child)) 1)
+                             (return t)))))
     (when (and *expose-direct-select* (not two-letters-key))
       (leave-query-mode :return))))
 
@@ -146,11 +146,11 @@
 
 (defun expose-init ()
   (setf *expose-font* (xlib:open-font *display* *expose-font-string*)
-	*expose-child-list* (expose-associate-keys)
-	*expose-selected-child* nil
+        *expose-child-list* (expose-associate-keys)
+        *expose-selected-child* nil
         *query-string* "")
   (xlib:warp-pointer *root* (truncate (/ (screen-width) 2))
-		     (truncate (/ (screen-height) 2)))
+                     (truncate (/ (screen-height) 2)))
   (add-hook *query-key-press-hook* 'expose-query-key-press-hook)
   (add-hook *query-button-press-hook* 'expose-query-button-press-hook))
 
@@ -171,17 +171,17 @@
 
 (defun expose-mode-display-accel-windows ()
   (let ((all-hidden-windows (get-hidden-windows)))
-	(with-all-root-child (root)
-	  (with-all-children-reversed (root child)
-		(let ((ex-child (find child *expose-child-list* :test #'child-equal-p :key #'expose-child-child)))
-		  (when ex-child
-			(if (or (frame-p (expose-child-child ex-child))
-					(managed-window-p (expose-child-child ex-child)
-									  (find-parent-frame (expose-child-child ex-child) *root-frame*)))
-				(unless (child-member (expose-child-child ex-child) all-hidden-windows)
-				  (expose-create-window ex-child))
-				(hide-child (expose-child-child ex-child)))))))
-	(expose-draw-letter)))
+    (with-all-root-child (root)
+      (with-all-children-reversed (root child)
+        (let ((ex-child (find child *expose-child-list* :test #'child-equal-p :key #'expose-child-child)))
+          (when ex-child
+            (if (or (frame-p (expose-child-child ex-child))
+                    (managed-window-p (expose-child-child ex-child)
+                                      (find-parent-frame (expose-child-child ex-child) *root-frame*)))
+                (unless (child-member (expose-child-child ex-child) all-hidden-windows)
+                  (expose-create-window ex-child))
+                (hide-child (expose-child-child ex-child)))))))
+    (expose-draw-letter)))
 
 
 (defun expose-find-child-from-letters (letters)
@@ -211,14 +211,14 @@
   (when *expose-font*
     (xlib:close-font *expose-font*))
   (when present-window
-	(expose-unpresent-windows)))
+    (expose-unpresent-windows)))
 
 (defun expose-focus-child (child)
   (let ((parent (typecase child
                   (xlib:window (find-parent-frame child))
                   (frame child))))
     (when (and child parent)
-	  (change-root (find-root parent) parent)
+      (change-root (find-root parent) parent)
       (setf (current-child) child)
       (focus-all-children child parent t))))
 
@@ -226,11 +226,11 @@
   (stop-button-event)
   (expose-init)
   (when present-window
-	(expose-present-windows))
+    (expose-present-windows))
   (expose-mode-display-accel-windows)
   (let ((child (expose-select-child)))
-	(expose-restore-windows present-window)
-	child))
+    (expose-restore-windows present-window)
+    child))
 
 
 (defun expose-windows-mode ()
@@ -256,7 +256,7 @@
 (defun expose-current-child-mode ()
   "Present all windows in currents roots (An expose like)"
   (with-saved-root-list ()
-	(awhen (expose-do-main nil)
-	  (expose-focus-child it)))
+    (awhen (expose-do-main nil)
+      (expose-focus-child it)))
   (show-all-children)
   t)

@@ -80,11 +80,11 @@
   "Define a second key to start a shell command"
   `(define-second-key ,key
        (defun ,name ()
-	 ,docstring
-	 (setf *second-mode-leave-function* (let ((cmd ,cmd))
-					      (lambda ()
-						(do-shell cmd))))
-	 (leave-second-mode))))
+         ,docstring
+         (setf *second-mode-leave-function* (let ((cmd ,cmd))
+                                              (lambda ()
+                                                (do-shell cmd))))
+         (leave-second-mode))))
 
 
 (defun set-default-second-keys ()

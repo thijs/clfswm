@@ -31,9 +31,9 @@
   (:use :common-lisp :tools)
   (:export :insert-html-doctype
            :escape-html
-	   :produce-html
-	   :with-html
-	   :produce-html-string))
+           :produce-html
+           :with-html
+           :produce-html-string))
 
 (in-package :my-html)
 
@@ -49,7 +49,7 @@
            (escape-html (concatenate 'string (subseq string 0 it)
                                      (cadar replace)
                                      (subseq string (+ it (length (caar replace)))))
-                replace)
+                        replace)
            (escape-html string (cdr replace)))
       string))
 
@@ -58,18 +58,18 @@
 
 (defun produce-html (tree &optional (level 0) (stream *standard-output*))
   (cond ((listp tree)
-	 (print-space level stream)
-	 (format stream "~(<~A>~)~%" (first tree))
-	 (dolist (subtree (rest tree))
-	   (produce-html subtree (+ 2 level) stream))
-	 (print-space level stream)
-	 (format stream "~(</~A>~)~%"
-		 (if (stringp (first tree))
-		     (subseq (first tree) 0 (position #\Space (first tree)))
-		     (first tree))))
-	(t
-	 (print-space level stream)
-	 (format stream (if (stringp tree) "~A~%" "~(~A~)~%") tree))))
+         (print-space level stream)
+         (format stream "~(<~A>~)~%" (first tree))
+         (dolist (subtree (rest tree))
+           (produce-html subtree (+ 2 level) stream))
+         (print-space level stream)
+         (format stream "~(</~A>~)~%"
+                 (if (stringp (first tree))
+                     (subseq (first tree) 0 (position #\Space (first tree)))
+                     (first tree))))
+        (t
+         (print-space level stream)
+         (format stream (if (stringp tree) "~A~%" "~(~A~)~%") tree))))
 
 
 (defmacro with-html ((&optional (stream t)) &rest rest)
@@ -85,17 +85,17 @@
 
 (defun test1 ()
   (produce-html `(html
-		  (head
-		   (title "Plop"))
-		  (body
-		   (h1 "A title")
-		   (h2 "plop")
-		   Plop ,(+ 2 2)
-		   ,(format nil "Plip=~A" (+ 3 5))
-		   ("a href=\"index.html\"" index)
-		   (ul
-		    (li "toto")
-		    (li "klm"))))))
+                  (head
+                   (title "Plop"))
+                  (body
+                   (h1 "A title")
+                   (h2 "plop")
+                   Plop ,(+ 2 2)
+                   ,(format nil "Plip=~A" (+ 3 5))
+                   ("a href=\"index.html\"" index)
+                   (ul
+                    (li "toto")
+                    (li "klm"))))))
 
 
 (defun test2 ()
@@ -114,16 +114,16 @@
 
 (defun test3 ()
   (produce-html-string `(html
-			 (head
-			  (title "Plop"))
-			 (body
-			  (h1 "A title")
-			  (h2 plop)
-			  Plop ,(+ 2 2)
-			  ,(format nil "Plip=~A" (+ 3 5))
-			  |Foo Bar Baz|
-			  ("a href=\"index.html\"" Index)
-			  (ul
-			   (li "toto")
-			   (li "klm"))))
-		       10))
+                         (head
+                          (title "Plop"))
+                         (body
+                          (h1 "A title")
+                          (h2 plop)
+                          Plop ,(+ 2 2)
+                          ,(format nil "Plip=~A" (+ 3 5))
+                          |Foo Bar Baz|
+                          ("a href=\"index.html\"" Index)
+                          (ul
+                           (li "toto")
+                           (li "klm"))))
+                       10))

@@ -44,8 +44,8 @@
 (defun set-nw-hook (hook)
   "Set the hook of the current child"
   (let ((frame (if (xlib:window-p (current-child))
-		   (find-parent-frame (current-child))
-		   (current-child))))
+                   (find-parent-frame (current-child))
+                   (current-child))))
     (unless (or (child-member frame *permanent-nw-hook-frames*)
                 (child-original-root-p frame))
       (setf (frame-nw-hook frame) hook)
@@ -167,7 +167,7 @@
   "Open the next window in a new frame in the parent frame"
   (clear-nw-hook frame)
   (let ((new-frame (create-frame))
-	(parent (find-parent-frame frame)))
+        (parent (find-parent-frame frame)))
     (when parent
       (pushnew new-frame (frame-child parent))
       (pushnew window (frame-child new-frame))
@@ -225,7 +225,7 @@
 (defun named-frame-nw-hook (frame window)
   (clear-nw-hook frame)
   (let* ((frame-name (ask-frame-name "Open the next window in frame named:"))
-	 (new-frame (find-frame-by-name frame-name)))
+         (new-frame (find-frame-by-name frame-name)))
     (nw-hook-open-in-frame window new-frame))
   t)
 
@@ -256,15 +256,15 @@
 (defun absorb-window-nw-hook (frame window)
   (let ((absorb-nw-test (frame-data-slot frame :nw-absorb-test)))
     (when (and absorb-nw-test
-	       (funcall absorb-nw-test window))
+               (funcall absorb-nw-test window))
       (pushnew window (frame-child frame))
       (unless *in-process-existing-windows*
-	(unless (find-child-in-all-root frame)
+        (unless (find-child-in-all-root frame)
           (change-root (find-root frame) frame))
-	(setf (current-child) frame)
-	(focus-all-children window frame)
-	(default-window-placement frame window)
-	(show-all-children t))
+        (setf (current-child) frame)
+        (focus-all-children window frame)
+        (default-window-placement frame window)
+        (show-all-children t))
       (throw 'nw-hook-loop t)))
   nil)
 
@@ -278,4 +278,4 @@
 (defun nw-absorb-test-class (class-string)
   (lambda (c)
     (and (xlib:window-p c)
-	 (string-equal (xlib:get-wm-class c) class-string))))
+         (string-equal (xlib:get-wm-class c) class-string))))

@@ -37,16 +37,16 @@
   (raise-window *circulate-window*)
   (clear-pixmap-buffer *circulate-window* *circulate-gc*)
   (let* ((text (format nil "~A [~A]"
-		       (limit-length (ensure-printable (child-name (xlib:input-focus *display*)))
-				     *circulate-text-limite*)
-		       (limit-length (ensure-printable (child-name (current-child)))
-				     *circulate-text-limite*)))
-	 (len (length text)))
+                       (limit-length (ensure-printable (child-name (xlib:input-focus *display*)))
+                                     *circulate-text-limite*)
+                       (limit-length (ensure-printable (child-name (current-child)))
+                                     *circulate-text-limite*)))
+         (len (length text)))
     (xlib:draw-glyphs *pixmap-buffer* *circulate-gc*
-		      (truncate (/ (- *circulate-width* (* (xlib:max-char-width *circulate-font*) len)) 2))
-		      (truncate (/ (+ *circulate-height* (- (xlib:font-ascent *circulate-font*)
+                      (truncate (/ (- *circulate-width* (* (xlib:max-char-width *circulate-font*) len)) 2))
+                      (truncate (/ (+ *circulate-height* (- (xlib:font-ascent *circulate-font*)
                                                             (xlib:font-descent *circulate-font*))) 2))
-		      text))
+                      text))
   (copy-pixmap-buffer *circulate-window* *circulate-gc*))
 
 
@@ -59,8 +59,8 @@
 
 (defun reset-circulate-child ()
   (setf *circulate-hit* 0
-	*circulate-parent* nil
-	*circulate-orig* (frame-child (current-child))))
+        *circulate-parent* nil
+        *circulate-orig* (frame-child (current-child))))
 
 (defun reset-circulate-brother ()
   (setf *circulate-parent* (find-parent-frame (current-child))
@@ -77,8 +77,8 @@
       (reset-circulate-child))
     (let ((len (length *circulate-orig*)))
       (when (plusp len)
-	(let ((elem (nth (mod (incf *circulate-hit* direction) len) *circulate-orig*)))
-	  (setf child (cons elem (child-remove elem *circulate-orig*))
+        (let ((elem (nth (mod (incf *circulate-hit* direction) len) *circulate-orig*)))
+          (setf child (cons elem (child-remove elem *circulate-orig*))
                 selected-pos 0)))
       (show-all-children)
       (draw-circulate-mode-window))))
@@ -92,11 +92,11 @@
       (reset-circulate-brother))
     (let ((len (length *circulate-orig*)))
       (when (plusp len)
-	(when (frame-p *circulate-parent*)
-	  (let ((elem (nth (mod (incf *circulate-hit* direction) len) *circulate-orig*)))
-	    (setf (frame-child *circulate-parent*) (cons elem (child-remove elem *circulate-orig*))
+        (when (frame-p *circulate-parent*)
+          (let ((elem (nth (mod (incf *circulate-hit* direction) len) *circulate-orig*)))
+            (setf (frame-child *circulate-parent*) (cons elem (child-remove elem *circulate-orig*))
                   (frame-selected-pos *circulate-parent*) 0
-		  (current-child) (frame-selected-child *circulate-parent*))))
+                  (current-child) (frame-selected-child *circulate-parent*))))
         (when (and (not (child-root-p (current-child)))
                    (child-root-p old-child))
           (change-root (find-root old-child) (current-child)))))
@@ -108,14 +108,14 @@
   (when (frame-p (current-child))
     (let ((selected-child (frame-selected-child (current-child))))
       (when (frame-p selected-child)
-	(no-focus)
-	(with-slots (child selected-pos) selected-child
-	  (let ((elem (first (last child))))
+        (no-focus)
+        (with-slots (child selected-pos) selected-child
+          (let ((elem (first (last child))))
             (when elem
               (setf child (cons elem (child-remove elem child))
                     selected-pos 0))
             (show-all-children)
-	    (draw-circulate-mode-window)))))))
+            (draw-circulate-mode-window)))))))
 
 
 
@@ -179,8 +179,8 @@
   (when *circulate-font*
     (xlib:close-font *circulate-font*))
   (setf *circulate-window* nil
-	*circulate-gc* nil
-	*circulate-font* nil)
+        *circulate-gc* nil
+        *circulate-font* nil)
   (xlib:display-finish-output *display*))
 
 (defun circulate-loop-function ()
@@ -190,8 +190,8 @@
 (define-handler circulate-mode :key-press (code state)
   (unless (funcall-key-from-code *circulate-keys* code state)
     (setf *circulate-hit* 0
-	  *circulate-orig* nil
-	  *circulate-parent* nil)
+          *circulate-orig* nil
+          *circulate-parent* nil)
     (funcall-key-from-code *main-keys* code state)))
 
 
@@ -204,21 +204,21 @@
   (setf *circulate-hit* 0)
   (with-placement (*circulate-mode-placement* x y *circulate-width* *circulate-height*)
     (setf *circulate-font* (xlib:open-font *display* *circulate-font-string*)
-	  *circulate-window* (xlib:create-window :parent *root*
-						 :x x
-						 :y y
-						 :width *circulate-width*
-						 :height *circulate-height*
-						 :background (get-color *circulate-background*)
-						 :border-width *border-size*
-						 :border (get-color *circulate-border*)
-						 :colormap (xlib:screen-default-colormap *screen*)
-						 :event-mask '(:exposure :key-press))
-	  *circulate-gc* (xlib:create-gcontext :drawable *circulate-window*
-					       :foreground (get-color *circulate-foreground*)
-					       :background (get-color *circulate-background*)
-					       :font *circulate-font*
-					       :line-style :solid))
+          *circulate-window* (xlib:create-window :parent *root*
+                                                 :x x
+                                                 :y y
+                                                 :width *circulate-width*
+                                                 :height *circulate-height*
+                                                 :background (get-color *circulate-background*)
+                                                 :border-width *border-size*
+                                                 :border (get-color *circulate-border*)
+                                                 :colormap (xlib:screen-default-colormap *screen*)
+                                                 :event-mask '(:exposure :key-press))
+          *circulate-gc* (xlib:create-gcontext :drawable *circulate-window*
+                                               :foreground (get-color *circulate-foreground*)
+                                               :background (get-color *circulate-background*)
+                                               :font *circulate-font*
+                                               :line-style :solid))
     (setf (window-transparency *circulate-window*) *circulate-transparency*)
     (map-window *circulate-window*)
     (draw-circulate-mode-window)
@@ -240,14 +240,14 @@
   "Select the next child"
   (when (frame-p (current-child))
     (setf *circulate-orig* (frame-child (current-child))
-	  *circulate-parent* nil)
+          *circulate-parent* nil)
     (circulate-mode :child-direction +1)))
 
 (defun select-previous-child ()
   "Select the previous child"
   (when (frame-p (current-child))
     (setf *circulate-orig* (frame-child (current-child))
-	  *circulate-parent* nil)
+          *circulate-parent* nil)
     (circulate-mode :child-direction -1)))
 
 
@@ -290,9 +290,9 @@
 (defun select-next-subchild ()
   "Select the next subchild"
   (when (and (frame-p (current-child))
-	     (frame-p (frame-selected-child (current-child))))
+             (frame-p (frame-selected-child (current-child))))
     (setf *circulate-orig* (frame-child (current-child))
-	  *circulate-parent* nil)
+          *circulate-parent* nil)
     (circulate-mode :subchild-direction +1)))
 
 

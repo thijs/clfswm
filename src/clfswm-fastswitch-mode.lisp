@@ -192,8 +192,8 @@
   (when *expose-font*
     (xlib:close-font *expose-font*))
   (setf *fastswitch-window* nil
-  	*fastswitch-gc* nil
-  	*fastswitch-font* nil)
+        *fastswitch-gc* nil
+        *fastswitch-font* nil)
   (xlib:display-finish-output *display*))
 
 

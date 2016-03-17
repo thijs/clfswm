@@ -144,8 +144,8 @@
   (when (frame-p frame)
     (with-slots (child selected-pos) frame
       (let ((len (length child)))
-	(cond ((minusp selected-pos) (setf selected-pos 0))
-	      ((>= selected-pos len) (setf selected-pos (max (1- len) 0)))))
+        (cond ((minusp selected-pos) (setf selected-pos 0))
+              ((>= selected-pos len) (setf selected-pos (max (1- len) 0)))))
       (nth selected-pos child))))
 
 
@@ -209,14 +209,14 @@
   "Return t only if window is managed by frame"
   (if (frame-p frame)
       (with-slots ((managed forced-managed-window)
-		   (unmanaged forced-unmanaged-window)) frame
-	(and (xlib:window-p window)
-	     (not (child-member window unmanaged))
-	     (not (member (xlib:wm-name window) unmanaged :test #'string-equal-p))
-	     (or (member :all (frame-managed-type frame))
-		 (member (window-type window) (frame-managed-type frame))
-		 (child-member window managed)
-		 (member (xlib:wm-name window) managed :test #'string-equal-p))))
+                   (unmanaged forced-unmanaged-window)) frame
+        (and (xlib:window-p window)
+             (not (child-member window unmanaged))
+             (not (member (xlib:wm-name window) unmanaged :test #'string-equal-p))
+             (or (member :all (frame-managed-type frame))
+                 (member (window-type window) (frame-managed-type frame))
+                 (child-member window managed)
+                 (member (xlib:wm-name window) managed :test #'string-equal-p))))
       t))
 
 
@@ -227,7 +227,7 @@
   (when (xlib:window-p window)
     (dolist (type *never-managed-window-list*)
       (when (funcall (first type) window)
-	(return (values t (second type)))))))
+        (return (values t (second type)))))))
 
 
 (defun never-managed-window-and-handled-p (window)
@@ -414,27 +414,27 @@
 ;; (with-all-children (*root-frame* child) (typecase child (xlib:window (print child)) (frame (print (frame-number child)))))
 (defmacro with-all-children ((root child) &body body)
   (let ((rec (gensym))
-	(sub-child (gensym)))
+        (sub-child (gensym)))
     `(block nil
        (labels ((,rec (,child)
-		  ,@body
-		  (when (frame-p ,child)
-		    (dolist (,sub-child (reverse (frame-child ,child)))
-		      (,rec ,sub-child)))))
-	 (,rec ,root)))))
+                  ,@body
+                  (when (frame-p ,child)
+                    (dolist (,sub-child (reverse (frame-child ,child)))
+                      (,rec ,sub-child)))))
+         (,rec ,root)))))
 
 
 ;; (with-all-children (*root-frame* child) (typecase child (xlib:window (print child)) (frame (print (frame-number child)))))
 (defmacro with-all-children-reversed ((root child) &body body)
   (let ((rec (gensym))
-	(sub-child (gensym)))
+        (sub-child (gensym)))
     `(block nil
        (labels ((,rec (,child)
-		  ,@body
-		  (when (frame-p ,child)
-		    (dolist (,sub-child (frame-child ,child))
-		      (,rec ,sub-child)))))
-	 (,rec ,root)))))
+                  ,@body
+                  (when (frame-p ,child)
+                    (dolist (,sub-child (frame-child ,child))
+                      (,rec ,sub-child)))))
+         (,rec ,root)))))
 
 
 
@@ -443,55 +443,55 @@
 ;; (with-all-frames (*root-frame* frame) (print (frame-number frame)))
 (defmacro with-all-frames ((root frame) &body body)
   (let ((rec (gensym))
-	(child (gensym)))
+        (child (gensym)))
     `(block nil
        (labels ((,rec (,frame)
-		  (when (frame-p ,frame)
-		    ,@body
-		    (dolist (,child (reverse (frame-child ,frame)))
-		      (,rec ,child)))))
-	 (,rec ,root)))))
+                  (when (frame-p ,frame)
+                    ,@body
+                    (dolist (,child (reverse (frame-child ,frame)))
+                      (,rec ,child)))))
+         (,rec ,root)))))
 
 
 ;; (with-all-windows (*root-frame* window) (print window))
 (defmacro with-all-windows ((root window) &body body)
   (let ((rec (gensym))
-	(child (gensym)))
+        (child (gensym)))
     `(block nil
        (labels ((,rec (,window)
-		  (when (xlib:window-p ,window)
-		    ,@body)
-		  (when (frame-p ,window)
-		    (dolist (,child (reverse (frame-child ,window)))
-		      (,rec ,child)))))
-	 (,rec ,root)))))
+                  (when (xlib:window-p ,window)
+                    ,@body)
+                  (when (frame-p ,window)
+                    (dolist (,child (reverse (frame-child ,window)))
+                      (,rec ,child)))))
+         (,rec ,root)))))
 
 
 
 ;; (with-all-frames-windows (*root-frame* child) (print child) (print (frame-number child)))
 (defmacro with-all-windows-frames ((root child) body-window body-frame)
   (let ((rec (gensym))
-	(sub-child (gensym)))
+        (sub-child (gensym)))
     `(block nil
        (labels ((,rec (,child)
-		  (typecase ,child
-		    (xlib:window ,body-window)
-		    (frame ,body-frame
-			   (dolist (,sub-child (reverse (frame-child ,child)))
-			     (,rec ,sub-child))))))
-	 (,rec ,root)))))
+                  (typecase ,child
+                    (xlib:window ,body-window)
+                    (frame ,body-frame
+                           (dolist (,sub-child (reverse (frame-child ,child)))
+                             (,rec ,sub-child))))))
+         (,rec ,root)))))
 
 (defmacro with-all-windows-frames-and-parent ((root child parent) body-window body-frame)
   (let ((rec (gensym))
-	(sub-child (gensym)))
+        (sub-child (gensym)))
     `(block nil
        (labels ((,rec (,child ,parent)
-		  (typecase ,child
-		    (xlib:window ,body-window)
-		    (frame ,body-frame
-			   (dolist (,sub-child (reverse (frame-child ,child)))
-			     (,rec ,sub-child ,child))))))
-	 (,rec ,root nil)))))
+                  (typecase ,child
+                    (xlib:window ,body-window)
+                    (frame ,body-frame
+                           (dolist (,sub-child (reverse (frame-child ,child)))
+                             (,rec ,sub-child ,child))))))
+         (,rec ,root nil)))))
 
 
 
@@ -553,7 +553,7 @@
 
 (defun create-frame (&rest args &key (number (frame-find-free-number)) &allow-other-keys)
   (let* ((window (create-frame-window))
-	 (gc (create-frame-gc window)))
+         (gc (create-frame-gc window)))
     (apply #'make-instance 'frame :number number :window window :gc gc args)))
 
 
@@ -567,13 +567,13 @@
   (when (and (frame-p frame) (frame-p parent))
     (with-slots (window x y w h) frame
       (setf (x-drawable-x window) prx
-	    (x-drawable-y window) pry
-	    (x-drawable-width window) prw
-	    (x-drawable-height window) prh
-	    x (x-px->fl prx parent)
-	    y (y-px->fl pry parent)
-	    w (w-px->fl prw parent)
-	    h (h-px->fl prh parent))
+            (x-drawable-y window) pry
+            (x-drawable-width window) prw
+            (x-drawable-height window) prh
+            x (x-px->fl prx parent)
+            y (y-px->fl pry parent)
+            w (w-px->fl prw parent)
+            h (h-px->fl prh parent))
       (xlib:display-finish-output *display*))))
 
 
@@ -590,10 +590,10 @@
   `(let (ret)
      (block return-block
        (with-all-frames (root frame)
-	 (when ,test
-	   (if first-foundp
-	       (return-from return-block (or ,return-value frame))
-	       (setf ret frame))))
+         (when ,test
+           (if first-foundp
+               (return-from return-block (or ,return-value frame))
+               (setf ret frame))))
        (or ,return-value ret))))
 
 (defun find-parent-frame  (to-find &optional (root *root-frame*) first-foundp)
@@ -610,23 +610,23 @@
   "Find a frame from its name"
   (when name
     (with-find-in-all-frames
-	(string-equal name (frame-name frame)))))
+        (string-equal name (frame-name frame)))))
 
 (defun find-frame-by-number (number &optional (root *root-frame*) first-foundp)
   "Find a frame from its number"
   (when (numberp number)
     (with-find-in-all-frames
-	(= number (frame-number frame)))))
+        (= number (frame-number frame)))))
 
 
 (defun find-child-in-parent (child base)
   "Return t if child is in base or in its parents"
   (labels ((rec (base)
-	     (when (child-equal-p child base)
-	       (return-from find-child-in-parent t))
-	     (let ((parent (find-parent-frame base)))
-	       (when parent
-		 (rec parent)))))
+             (when (child-equal-p child base)
+               (return-from find-child-in-parent t))
+             (let ((parent (find-parent-frame base)))
+               (when parent
+                 (rec parent)))))
     (rec base)))
 
 ;;; Multiple roots support (replace the old *current-root* variable)
@@ -786,9 +786,9 @@
   (when (frame-p frame)
     (with-slots (x y w h rx ry rw rh) frame
       (setf x (x-px->fl rx parent)
-	    y (y-px->fl ry parent)
-	    w (w-px->fl (anti-adj-border-wh rw parent) parent)
-	    h (h-px->fl (anti-adj-border-wh rh parent) parent)))))
+            y (y-px->fl ry parent)
+            w (w-px->fl (anti-adj-border-wh rw parent) parent)
+            h (h-px->fl (anti-adj-border-wh rh parent) parent)))))
 
 (defun fixe-real-size-current-child ()
   "Fixe real (pixel) coordinates in float coordinates for children in the current child"
@@ -942,8 +942,8 @@ XINERAMA version 1.1 opcode: 150
 (defun get-hidden-windows ()
   "Return all hiddens windows"
   (let ((all-windows (get-all-windows))
-	(hidden-windows (remove-if-not #'window-hidden-p
-				       (copy-list (xlib:query-tree *root*)))))
+        (hidden-windows (remove-if-not #'window-hidden-p
+                                       (copy-list (xlib:query-tree *root*)))))
     (set-difference hidden-windows all-windows)))
 
 
@@ -957,8 +957,8 @@ XINERAMA version 1.1 opcode: 150
 (defmacro with-current-window (&body body)
   "Bind 'window' to the current window"
   `(let ((window (get-current-window)))
-      (when (xlib:window-p window)
-	,@body)))
+     (when (xlib:window-p window)
+       ,@body)))
 
 (defun get-first-window ()
   (typecase (current-child)
@@ -1039,7 +1039,7 @@ XINERAMA version 1.1 opcode: 150
 (defmethod adapt-child-to-parent ((window xlib:window) parent)
   (when (managed-window-p window parent)
     (multiple-value-bind (nx ny nw nh)
-	(get-parent-layout window parent)
+        (get-parent-layout window parent)
       (setf nw (max nw 1)  nh (max nh 1))
       (let ((change nil))
         (when (or (/= (x-drawable-x window) nx)
@@ -1054,26 +1054,26 @@ XINERAMA version 1.1 opcode: 150
                   (x-drawable-y window) ny
                   (x-drawable-width window) nw
                   (x-drawable-height window) nh)))
-	change))))
+        change))))
 
 
 (defmethod adapt-child-to-parent ((frame frame) parent)
   (declare (ignore parent))
-    (with-slots (rx ry rw rh window) frame
-      (let ((change nil))
-        (when (or (/= (x-drawable-x window) rx)
-                  (/= (x-drawable-y window) ry))
-          (setf change :moved))
-        (when (or (/= (x-drawable-width window) rw)
-                  (/= (x-drawable-height window) rh))
-          (setf change :resized))
-        (when change
-          (xlib:with-state (window)
-            (setf (x-drawable-x window) rx
-                  (x-drawable-y window) ry
-                  (x-drawable-width window) rw
-                  (x-drawable-height window) rh)))
-	change)))
+  (with-slots (rx ry rw rh window) frame
+    (let ((change nil))
+      (when (or (/= (x-drawable-x window) rx)
+                (/= (x-drawable-y window) ry))
+        (setf change :moved))
+      (when (or (/= (x-drawable-width window) rw)
+                (/= (x-drawable-height window) rh))
+        (setf change :resized))
+      (when change
+        (xlib:with-state (window)
+          (setf (x-drawable-x window) rx
+                (x-drawable-y window) ry
+                (x-drawable-width window) rw
+                (x-drawable-height window) rh)))
+      change)))
 
 (defmethod adapt-child-to-parent (child parent)
   (declare (ignore child parent))
@@ -1106,8 +1106,8 @@ XINERAMA version 1.1 opcode: 150
         (progn
           (map-window window)
           (set-child-stack-order window previous)
-	  (display-frame-info frame))
-	(hide-window window))))
+          (display-frame-info frame))
+        (hide-window window))))
 
 
 
@@ -1121,12 +1121,12 @@ XINERAMA version 1.1 opcode: 150
 
 (defmethod show-child ((window xlib:window) parent previous)
   (if (or (managed-window-p window parent)
-	  (child-equal-p window (current-child))
-	  (not (hide-unmanaged-window-p parent))
+          (child-equal-p window (current-child))
+          (not (hide-unmanaged-window-p parent))
           (child-is-a-current-child-p parent))
       (progn
-	(map-window window)
-	(set-child-stack-order window previous))
+        (map-window window)
+        (set-child-stack-order window previous))
       (hide-window window)))
 
 (defmethod show-child (child parent raise-p)
@@ -1178,9 +1178,9 @@ XINERAMA version 1.1 opcode: 150
 
 (defun set-focus-to-current-child ()
   (labels ((rec (child)
-	     (typecase child
-	       (xlib:window (focus-window child))
-	       (frame (rec (frame-selected-child child))))))
+             (typecase child
+               (xlib:window (focus-window child))
+               (frame (rec (frame-selected-child child))))))
     (no-focus)
     (rec (current-child))))
 
@@ -1192,8 +1192,8 @@ XINERAMA version 1.1 opcode: 150
       (get-parent-layout frame parent)
     (with-slots (rx ry rw rh window) frame
       (setf rx nx  ry ny
-	    rw (max nw 1)
-	    rh (max nh 1)))))
+            rw (max nw 1)
+            rh (max nh 1)))))
 
 
 (defun adapt-child-to-rect (rect)
@@ -1203,15 +1203,15 @@ XINERAMA version 1.1 opcode: 150
                   (frame (frame-window (child-rect-child rect))))))
     (when window
       (let ((change (or (/= (x-drawable-x window) (child-rect-x rect))
-			(/= (x-drawable-y window) (child-rect-y rect))
-			(/= (x-drawable-width window) (child-rect-w rect))
-			(/= (x-drawable-height window) (child-rect-h rect)))))
+                        (/= (x-drawable-y window) (child-rect-y rect))
+                        (/= (x-drawable-width window) (child-rect-w rect))
+                        (/= (x-drawable-height window) (child-rect-h rect)))))
         (when change
           (setf (x-drawable-width window) (child-rect-w rect)
                 (x-drawable-height window) (child-rect-h rect)
                 (x-drawable-x window) (child-rect-x rect)
                 (x-drawable-y window) (child-rect-y rect)))
-	change))))
+        change))))
 
 
 
@@ -1332,20 +1332,20 @@ XINERAMA version 1.1 opcode: 150
 (defun focus-child (child parent)
   "Focus child - Return true if something has change"
   (when (and (frame-p parent)
-	     (child-member child (frame-child parent)))
+             (child-member child (frame-child parent)))
     (when (not (child-equal-p child (frame-selected-child parent)))
       (with-slots ((parent-child child) selected-pos) parent
-	(setf parent-child (nth-insert selected-pos child (child-remove child parent-child))))
+        (setf parent-child (nth-insert selected-pos child (child-remove child parent-child))))
       t)))
 
 (defun focus-child-rec (child parent)
   "Focus child and its parents - Return true if something has change"
   (let ((change nil))
     (labels ((rec (child parent)
-	       (when (focus-child child parent)
-		 (setf change t))
-	       (when parent
-		 (rec parent (find-parent-frame parent)))))
+               (when (focus-child child parent)
+                 (setf change t))
+               (when parent
+                 (rec parent (find-parent-frame parent)))))
       (rec child parent))
     change))
 
@@ -1434,10 +1434,10 @@ For window: set current child to window or its parent according to window-parent
   (when (frame-p (current-child))
     (with-slots (child selected-pos) (current-child)
       (unless (>= selected-pos (length child))
-	(when (nth (1+ selected-pos) child)
-	  (rotatef (nth selected-pos child)
-		   (nth (1+ selected-pos) child)))
-	(incf selected-pos)))
+        (when (nth (1+ selected-pos) child)
+          (rotatef (nth selected-pos child)
+                   (nth (1+ selected-pos) child)))
+        (incf selected-pos)))
     (show-all-children)))
 
 
@@ -1446,10 +1446,10 @@ For window: set current child to window or its parent according to window-parent
   (when (frame-p (current-child))
     (with-slots (child selected-pos) (current-child)
       (unless (< selected-pos 1)
-	(when (nth (1- selected-pos) child)
-	  (rotatef (nth selected-pos child)
-		   (nth (1- selected-pos) child)))
-	(decf selected-pos)))
+        (when (nth (1- selected-pos) child)
+          (rotatef (nth selected-pos child)
+                   (nth (1- selected-pos) child)))
+        (decf selected-pos)))
     (show-all-children)))
 
 
@@ -1591,8 +1591,8 @@ Warning:frame window and gc are freeed."
   (catch 'nw-hook-loop
     (let ((found nil))
       (with-all-frames (*root-frame* frame)
-	(awhen (frame-nw-hook frame)
-	  (setf found (call-hook it frame window))))
+        (awhen (frame-nw-hook frame)
+          (setf found (call-hook it frame window))))
       found)))
 
 
@@ -1622,13 +1622,13 @@ managed."
   (let ((all-windows (get-all-windows)))
     (dolist (win (xlib:query-tree (xlib:screen-root screen)))
       (unless (child-member win all-windows)
-	(let ((map-state (xlib:window-map-state win))
-	      (wm-state (window-state win)))
-	  (unless (or (eql (xlib:window-override-redirect win) :on)
-		      (eql win *no-focus-window*)
+        (let ((map-state (xlib:window-map-state win))
+              (wm-state (window-state win)))
+          (unless (or (eql (xlib:window-override-redirect win) :on)
+                      (eql win *no-focus-window*)
                       (is-notify-window-p win))
-	    (when (or (eql map-state :viewable)
-		      (eql wm-state +iconic-state+))
+            (when (or (eql map-state :viewable)
+                      (eql wm-state +iconic-state+))
               (funcall fun win))))))))
 
 (defun store-root-background ()
@@ -1661,27 +1661,27 @@ managed."
   "Windows present when clfswm starts up must be absorbed by clfswm."
   (setf *in-process-existing-windows* t)
   (let ((id-list nil)
-	(all-windows (get-all-windows))
+        (all-windows (get-all-windows))
         (all-frame-windows (get-all-frame-windows)))
     (dolist (win (xlib:query-tree (xlib:screen-root screen)))
       (unless (or (child-member win all-windows)
                   (child-member win all-frame-windows)
                   (child-equal-p win *no-focus-window*)
                   (child-equal-p win *sm-window*))
-	(let ((map-state (xlib:window-map-state win))
-	      (wm-state (window-state win)))
-	  (unless (or (eql (xlib:window-override-redirect win) :on)
-		      (eql win *no-focus-window*)
+        (let ((map-state (xlib:window-map-state win))
+              (wm-state (window-state win)))
+          (unless (or (eql (xlib:window-override-redirect win) :on)
+                      (eql win *no-focus-window*)
                       (is-notify-window-p win)
                       (never-managed-window-p win))
-	    (when (or (eql map-state :viewable)
-		      (eql wm-state +iconic-state+))
-	      (format t "Processing ~S: type=~A ~S~%" (xlib:wm-name win) (window-type win) win)
-	      (unhide-window win)
-	      (process-new-window win)
-	      (map-window win)
-	      (raise-window win)
-	      (pushnew (xlib:window-id win) id-list))))))
+            (when (or (eql map-state :viewable)
+                      (eql wm-state +iconic-state+))
+              (format t "Processing ~S: type=~A ~S~%" (xlib:wm-name win) (window-type win) win)
+              (unhide-window win)
+              (process-new-window win)
+              (map-window win)
+              (raise-window win)
+              (pushnew (xlib:window-id win) id-list))))))
     (netwm-set-client-list id-list))
   (setf *in-process-existing-windows* nil))
 
@@ -1691,13 +1691,13 @@ managed."
   "Put the child on top of its parent children"
   (when (frame-p parent)
     (setf (frame-child parent) (cons child (child-remove child (frame-child parent)))
-	  (frame-selected-pos parent) 0)))
+          (frame-selected-pos parent) 0)))
 
 (defun put-child-on-bottom (child parent)
   "Put the child at the bottom of its parent children"
   (when (frame-p parent)
     (setf (frame-child parent) (append (child-remove child (frame-child parent)) (list child))
-	  (frame-selected-pos parent) 0)))
+          (frame-selected-pos parent) 0)))
 
 
 (let ((last-child nil))

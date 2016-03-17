@@ -29,7 +29,7 @@
 
 (defpackage version
   (:use :common-lisp :tools)
-   (:export *version*))
+  (:export *version*))
 
 (in-package :version)
 

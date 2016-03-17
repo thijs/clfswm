@@ -28,14 +28,14 @@
 
 (defmacro with-all-menu ((menu item) &body body)
   (let ((rec (gensym))
-	(subm (gensym)))
+        (subm (gensym)))
     `(labels ((,rec (,item)
-		,@body
-		(when (menu-p ,item)
-		  (dolist (,subm (menu-item ,item))
-		    (,rec ,subm)))
-		(when (and (menu-item-p ,item) (menu-p (menu-item-value ,item)))
-		  (,rec (menu-item-value ,item)))))
+                ,@body
+                (when (menu-p ,item)
+                  (dolist (,subm (menu-item ,item))
+                    (,rec ,subm)))
+                (when (and (menu-item-p ,item) (menu-p (menu-item-value ,item)))
+                  (,rec (menu-item-value ,item)))))
        (,rec ,menu))))
 
 (defun add-item (item &optional (menu *menu*))
@@ -50,28 +50,28 @@
 (defun find-menu (name  &optional (root *menu*))
   (with-all-menu (root item)
     (when (and (menu-p item)
-	       (equal name (menu-name item)))
+               (equal name (menu-name item)))
       (return-from find-menu item))))
 
 (defun find-toplevel-menu (name &optional (root *menu*))
   (when (menu-p root)
     (dolist (item (menu-item root))
       (when (and (menu-item-p item)
-		 (menu-p (menu-item-value item)))
-	(when (equal name (menu-name (menu-item-value item)))
-	  (return (menu-item-value item)))))))
+                 (menu-p (menu-item-value item)))
+        (when (equal name (menu-name (menu-item-value item)))
+          (return (menu-item-value item)))))))
 
 
 (defun find-item-by-key (key &optional (root *menu*))
   (with-all-menu (root item)
     (when (and (menu-item-p item)
-	       (equal (menu-item-key item) key))
+               (equal (menu-item-key item) key))
       (return-from find-item-by-key item))))
 
 (defun find-item-by-value (value &optional (root *menu*))
   (with-all-menu (root item)
     (when (and (menu-item-p item)
-	       (equal (menu-item-value item) value))
+               (equal (menu-item-value item) value))
       (return-from find-item-by-value item))))
 
 
@@ -97,9 +97,9 @@
 
 (defun add-sub-menu (menu-or-name key sub-menu-name &optional (doc "Sub menu") (root *menu*))
   (let ((menu (if (or (stringp menu-or-name) (symbolp menu-or-name))
-		  (find-menu menu-or-name root)
-		  menu-or-name))
-	(submenu (make-menu :name sub-menu-name :doc doc)))
+                  (find-menu menu-or-name root)
+                  menu-or-name))
+        (submenu (make-menu :name sub-menu-name :doc doc)))
     (add-item (make-menu-item :key (find-next-menu-key key menu) :value submenu) menu)
     submenu))
 
@@ -132,9 +132,9 @@
   (typecase action
     (menu (open-menu action (cons menu parent)))
     (null (awhen (first parent)
-	    (open-menu it (rest parent))))
+            (open-menu it (rest parent))))
     (t (when (fboundp action)
-	 (funcall action)))))
+         (funcall action)))))
 
 
 (let ((menu-oppened nil))

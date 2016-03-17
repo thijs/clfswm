@@ -31,8 +31,8 @@
     (function (funcall placement width height border-size))
     (symbol
      (if (fboundp placement)
-	 (funcall placement width height border-size)
-	 (values 0 0 width height)))
+         (funcall placement width height border-size)
+         (values 0 0 width height)))
     (t (values 0 0 width height))))
 
 (defmacro with-placement ((placement x y &optional (width 0) (height 0) border-size) &body body)
@@ -119,7 +119,7 @@
 (defun here-placement (&optional (width 0) (height 0) (border-size *border-size*))
   (declare (ignore border-size))
   (with-x-pointer
-      (values x y width height)))
+    (values x y width height)))
 
 
 ;;;
@@ -128,14 +128,14 @@
 (defun current-child-coord (border-size)
   (typecase (current-child)
     (xlib:window (values (x-drawable-x (current-child))
-			 (x-drawable-y (current-child))
-			 (- (x-drawable-width (current-child)) (* 2 border-size))
-			 (- (x-drawable-height (current-child)) (* 2 border-size))
+                         (x-drawable-y (current-child))
+                         (- (x-drawable-width (current-child)) (* 2 border-size))
+                         (- (x-drawable-height (current-child)) (* 2 border-size))
                          (x-drawable-border-width (current-child))))
     (frame (values (frame-rx (current-child))
-		   (frame-ry (current-child))
-		   (- (frame-rw (current-child)) (* 2 border-size))
-		   (- (frame-rh (current-child)) (* 2 border-size))
+                   (frame-ry (current-child))
+                   (- (frame-rw (current-child)) (* 2 border-size))
+                   (- (frame-rh (current-child)) (* 2 border-size))
                    (x-drawable-border-width (frame-window (current-child)))))
     (t (values 0 0 10 10 1))))
 

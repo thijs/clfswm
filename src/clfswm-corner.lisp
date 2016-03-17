@@ -28,32 +28,32 @@
 
 
 (symbol-macrolet ((sw (screen-width))
-		  (sh (screen-height))
-		  (cs *corner-size*))
+                  (sh (screen-height))
+                  (cs *corner-size*))
   (defun in-corner (corner x y)
     "Return t if (x, y) is in corner.
 Corner is one of :bottom-right :bottom-left :top-right :top-left"
     (multiple-value-bind (xmin ymin xmax ymax)
-	(case corner
-	  (:bottom-right (values (- sw cs)  (- sh cs)  sw  sh))
-	  (:bottom-left (values 0  (- sh cs)  cs  sh))
-	  (:top-left (values 0 0 cs cs))
-	  (:top-right (values (- sw cs)  0  sw  cs))
-	  (t (values 10 10 0 0)))
+        (case corner
+          (:bottom-right (values (- sw cs)  (- sh cs)  sw  sh))
+          (:bottom-left (values 0  (- sh cs)  cs  sh))
+          (:top-left (values 0 0 cs cs))
+          (:top-right (values (- sw cs)  0  sw  cs))
+          (t (values 10 10 0 0)))
       (and (<= xmin x xmax)
-	   (<= ymin y ymax)))))
+           (<= ymin y ymax)))))
 
 
 (symbol-macrolet ((sw (screen-width))
-		  (sh (screen-height))
-		  (cs *corner-size*))
+                  (sh (screen-height))
+                  (cs *corner-size*))
   (defun find-corner (x y)
     (cond ((and (< cs x (- sw cs)) (< cs y (- sh cs))) nil)
-	  ((and (<= 0 x cs) (<= 0 y cs)) :top-left)
-	  ((and (<= (- sw cs) x sw) (<= 0 y cs)) :top-right)
-	  ((and (<= 0 x cs) (<= (- sh cs) y sh)) :bottom-left)
-	  ((and (<= (- sw cs) x sw) (<= (- sh cs) y sh)) :bottom-right)
-	  (t nil))))
+          ((and (<= 0 x cs) (<= 0 y cs)) :top-left)
+          ((and (<= (- sw cs) x sw) (<= 0 y cs)) :top-right)
+          ((and (<= 0 x cs) (<= (- sh cs) y sh)) :bottom-left)
+          ((and (<= (- sw cs) x sw) (<= (- sh cs) y sh)) :bottom-right)
+          (t nil))))
 
 
 
@@ -64,9 +64,9 @@ stop the button event"
   (when (frame-p (find-current-root))
     (let ((corner (find-corner x y)))
       (when corner
-	(let ((fun (second (assoc corner corner-list))))
-	  (when fun
-	    (funcall fun)))))))
+        (let ((fun (second (assoc corner corner-list))))
+          (when fun
+            (funcall fun)))))))
 
 
 
@@ -83,10 +83,10 @@ stop the button event"
 
 (defun wait-window-in-query-tree (wait-test)
   (dotimes (try *corner-command-try-number*)
-     (dolist (win (xlib:query-tree *root*))
-       (when (funcall wait-test win)
-	 (return-from wait-window-in-query-tree win)))
-     (sleep *corner-command-try-delay*)))
+    (dolist (win (xlib:query-tree *root*))
+      (when (funcall wait-test win)
+        (return-from wait-window-in-query-tree win)))
+    (sleep *corner-command-try-delay*)))
 
 
 (defun generic-present-body (cmd wait-test win &optional focus-p)
@@ -122,9 +122,9 @@ stop the button event"
   (defun present-virtual-keyboard ()
     "Present a virtual keyboard"
     (setf win (generic-present-body *virtual-keyboard-cmd*
-				    (lambda (win)
-				      (string-equal (xlib:get-wm-class win) "xvkbd"))
-				    win))
+                                    (lambda (win)
+                                      (string-equal (xlib:get-wm-class win) "xvkbd"))
+                                    win))
     t))
 
 
@@ -140,8 +140,8 @@ stop the button event"
   (defun present-clfswm-terminal ()
     "Hide/Unhide a terminal"
     (setf win (generic-present-body *clfswm-terminal-cmd*
-				    (lambda (win)
-				      (string-equal (xlib:wm-name win) *clfswm-terminal-name*))
-				    win
-				    t))
+                                    (lambda (win)
+                                      (string-equal (xlib:wm-name win) *clfswm-terminal-name*))
+                                    win
+                                    t))
     t))

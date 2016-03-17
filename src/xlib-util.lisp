@@ -34,13 +34,13 @@
 
 
 (defparameter *window-events* '(:structure-notify
-				:property-change
-				:colormap-change
-				:focus-change
-				:enter-window
+                                :property-change
+                                :colormap-change
+                                :focus-change
+                                :enter-window
                                 :leave-window
                                 :pointer-motion
-				:exposure)
+                                :exposure)
   "The events to listen for on managed windows.")
 
 
@@ -143,13 +143,13 @@ Features: ~A"
 
 (defun handle-event->keyword (symbol)
   (let* ((name (string-downcase (symbol-name symbol)))
-	 (pos (search "handle-event-fun-" name)))
+         (pos (search "handle-event-fun-" name)))
     (when (and pos (zerop pos))
       (let ((pos-mod (search "mode" name)))
-	(when pos-mod
+        (when pos-mod
           (intern (string-upcase (subseq name (+ pos-mod 5))) :keyword))))))
-;;	  (values (intern (string-upcase (subseq name (+ pos-mod 5))) :keyword)
-;;		  (subseq name (length "handle-event-fun-") (1- pos-mod))))))))
+;;    (values (intern (string-upcase (subseq name (+ pos-mod 5))) :keyword)
+;;      (subseq name (length "handle-event-fun-") (1- pos-mod))))))))
 
 (defparameter *handle-event-fun-symbols* nil)
 
@@ -157,7 +157,7 @@ Features: ~A"
   (with-all-internal-symbols (symbol :clfswm)
     (let ((pos (symbol-search "handle-event-fun-" symbol)))
       (when (and pos (zerop pos))
-	(pushnew symbol *handle-event-fun-symbols*)))))
+        (pushnew symbol *handle-event-fun-symbols*)))))
 
 
 (defmacro with-handle-event-symbol ((mode) &body body)
@@ -165,8 +165,8 @@ Features: ~A"
   `(let ((pattern (format nil "handle-event-fun-~A" ,mode)))
      (dolist (symbol *handle-event-fun-symbols*)
        (let ((pos (symbol-search pattern symbol)))
-	 (when (and pos (zerop pos))
-	   ,@body)))))
+         (when (and pos (zerop pos))
+           ,@body)))))
 
 
 (defun find-handle-event-function (&optional (mode ""))
@@ -181,11 +181,11 @@ For example: main-mode :key-press is bound to handle-event-fun-main-mode-key-pre
   (with-handle-event-symbol (mode)
     (let ((keyword (handle-event->keyword symbol)))
       (when (fboundp symbol)
-	#+:event-debug
-	(progn
-	  (format t "~&Associating: ~S with ~S~%" symbol keyword)
-	  (force-output))
-	(setf (symbol-function keyword) (symbol-function symbol))))))
+        #+:event-debug
+        (progn
+          (format t "~&Associating: ~S with ~S~%" symbol keyword)
+          (force-output))
+        (setf (symbol-function keyword) (symbol-function symbol))))))
 
 (defun unassoc-keyword-handle-event (&optional (mode ""))
   "Unbound all keywords from their corresponding handle event functions."
@@ -193,11 +193,11 @@ For example: main-mode :key-press is bound to handle-event-fun-main-mode-key-pre
   (with-handle-event-symbol (mode)
     (let ((keyword (handle-event->keyword symbol)))
       (when (fboundp keyword)
-	#+:event-debug
-	(progn
-	  (format t "~&Unassociating: ~S  ~S~%" symbol keyword)
-	  (force-output))
-	(fmakunbound keyword)))))
+        #+:event-debug
+        (progn
+          (format t "~&Unassociating: ~S  ~S~%" symbol keyword)
+          (force-output))
+        (fmakunbound keyword)))))
 
 (defmacro define-handler (mode keyword args &body body)
   "Like a defun but with a name expanded as handle-event-fun-'mode'-'keyword'
@@ -301,7 +301,7 @@ they should be windows. So use this function to make a window out of them."
           (xlib:display-finish-output *display*))
       ((or xlib:window-error xlib:drawable-error) (c)
         #-xlib-debug (declare (ignore c))
-        #+xlib-debug (format t "Ignore Xlib synchronous error: ~a~%" c)))
+       #+xlib-debug (format t "Ignore Xlib synchronous error: ~a~%" c)))
     t))
 
 
@@ -311,10 +311,10 @@ they should be windows. So use this function to make a window out of them."
 (defun parse-display-string (display)
   "Parse an X11 DISPLAY string and return the host and display from it."
   (let* ((colon (position #\: display))
-	 (host (subseq display 0 colon))
-	 (rest (subseq display (1+ colon)))
-	 (dot (position #\. rest))
-	 (num (parse-integer (subseq rest 0 dot))))
+         (host (subseq display 0 colon))
+         (rest (subseq display (1+ colon)))
+         (dot (position #\. rest))
+         (num (parse-integer (subseq rest 0 dot))))
     (values host num)))
 
 
@@ -370,10 +370,10 @@ they should be windows. So use this function to make a window out of them."
 (defun set-window-state (win state)
   "Set the state (iconic, normal, withdrawn) of a window."
   (xlib:change-property win
-			:WM_STATE
-			(list state)
-			:WM_STATE
-			32))
+                        :WM_STATE
+                        (list state)
+                        :WM_STATE
+                        32))
 
 (defsetf window-state set-window-state)
 
@@ -400,7 +400,7 @@ they should be windows. So use this function to make a window out of them."
     (when (window-hidden-p window)
       (xlib:map-window window)
       (setf (window-state window) +normal-state+
-	    (xlib:window-event-mask window) *window-events*))))
+            (xlib:window-event-mask window) *window-events*))))
 
 
 (defun map-window (window)
@@ -410,7 +410,7 @@ they should be windows. So use this function to make a window out of them."
 
 (defun delete-window (window)
   (send-client-message window :WM_PROTOCOLS
-		       (xlib:intern-atom *display* :WM_DELETE_WINDOW)))
+                       (xlib:intern-atom *display* :WM_DELETE_WINDOW)))
 
 (defun destroy-window (window)
   (xlib:kill-client *display* (xlib:window-id window)))
@@ -418,59 +418,59 @@ they should be windows. So use this function to make a window out of them."
 
 ;;(defconstant +exwm-atoms+
 ;;  (list "_NET_SUPPORTED"              "_NET_CLIENT_LIST"
-;;	"_NET_CLIENT_LIST_STACKING"   "_NET_NUMBER_OF_DESKTOPS"
-;;	"_NET_CURRENT_DESKTOP"        "_NET_DESKTOP_GEOMETRY"
-;;	"_NET_DESKTOP_VIEWPORT"       "_NET_DESKTOP_NAMES"
-;;	"_NET_ACTIVE_WINDOW"          "_NET_WORKAREA"
-;;	"_NET_SUPPORTING_WM_CHECK"    "_NET_VIRTUAL_ROOTS"
-;;	"_NET_DESKTOP_LAYOUT"
+;;  "_NET_CLIENT_LIST_STACKING"   "_NET_NUMBER_OF_DESKTOPS"
+;;  "_NET_CURRENT_DESKTOP"        "_NET_DESKTOP_GEOMETRY"
+;;  "_NET_DESKTOP_VIEWPORT"       "_NET_DESKTOP_NAMES"
+;;  "_NET_ACTIVE_WINDOW"          "_NET_WORKAREA"
+;;  "_NET_SUPPORTING_WM_CHECK"    "_NET_VIRTUAL_ROOTS"
+;;  "_NET_DESKTOP_LAYOUT"
 ;;
 ;;        "_NET_RESTACK_WINDOW"         "_NET_REQUEST_FRAME_EXTENTS"
 ;;        "_NET_MOVERESIZE_WINDOW"      "_NET_CLOSE_WINDOW"
 ;;        "_NET_WM_MOVERESIZE"
 ;;
-;;	"_NET_WM_SYNC_REQUEST"        "_NET_WM_PING"
+;;  "_NET_WM_SYNC_REQUEST"        "_NET_WM_PING"
 ;;
-;;	"_NET_WM_NAME"                "_NET_WM_VISIBLE_NAME"
-;;	"_NET_WM_ICON_NAME"           "_NET_WM_VISIBLE_ICON_NAME"
-;;	"_NET_WM_DESKTOP"             "_NET_WM_WINDOW_TYPE"
-;;	"_NET_WM_STATE"               "_NET_WM_STRUT"
-;;	"_NET_WM_ICON_GEOMETRY"       "_NET_WM_ICON"
-;;	"_NET_WM_PID"                 "_NET_WM_HANDLED_ICONS"
-;;	"_NET_WM_USER_TIME"           "_NET_FRAME_EXTENTS"
+;;  "_NET_WM_NAME"                "_NET_WM_VISIBLE_NAME"
+;;  "_NET_WM_ICON_NAME"           "_NET_WM_VISIBLE_ICON_NAME"
+;;  "_NET_WM_DESKTOP"             "_NET_WM_WINDOW_TYPE"
+;;  "_NET_WM_STATE"               "_NET_WM_STRUT"
+;;  "_NET_WM_ICON_GEOMETRY"       "_NET_WM_ICON"
+;;  "_NET_WM_PID"                 "_NET_WM_HANDLED_ICONS"
+;;  "_NET_WM_USER_TIME"           "_NET_FRAME_EXTENTS"
 ;;        ;; "_NET_WM_MOVE_ACTIONS"
 ;;
-;;	"_NET_WM_WINDOW_TYPE_DESKTOP" "_NET_WM_STATE_MODAL"
-;;	"_NET_WM_WINDOW_TYPE_DOCK"    "_NET_WM_STATE_STICKY"
-;;	"_NET_WM_WINDOW_TYPE_TOOLBAR" "_NET_WM_STATE_MAXIMIZED_VERT"
-;;	"_NET_WM_WINDOW_TYPE_MENU"    "_NET_WM_STATE_MAXIMIZED_HORZ"
-;;	"_NET_WM_WINDOW_TYPE_UTILITY" "_NET_WM_STATE_SHADED"
-;;	"_NET_WM_WINDOW_TYPE_SPLASH"  "_NET_WM_STATE_SKIP_TASKBAR"
-;;	"_NET_WM_WINDOW_TYPE_DIALOG"  "_NET_WM_STATE_SKIP_PAGER"
-;;	"_NET_WM_WINDOW_TYPE_NORMAL"  "_NET_WM_STATE_HIDDEN"
-;;	                              "_NET_WM_STATE_FULLSCREEN"
-;;				      "_NET_WM_STATE_ABOVE"
-;;				      "_NET_WM_STATE_BELOW"
-;;				      "_NET_WM_STATE_DEMANDS_ATTENTION"
+;;  "_NET_WM_WINDOW_TYPE_DESKTOP" "_NET_WM_STATE_MODAL"
+;;  "_NET_WM_WINDOW_TYPE_DOCK"    "_NET_WM_STATE_STICKY"
+;;  "_NET_WM_WINDOW_TYPE_TOOLBAR" "_NET_WM_STATE_MAXIMIZED_VERT"
+;;  "_NET_WM_WINDOW_TYPE_MENU"    "_NET_WM_STATE_MAXIMIZED_HORZ"
+;;  "_NET_WM_WINDOW_TYPE_UTILITY" "_NET_WM_STATE_SHADED"
+;;  "_NET_WM_WINDOW_TYPE_SPLASH"  "_NET_WM_STATE_SKIP_TASKBAR"
+;;  "_NET_WM_WINDOW_TYPE_DIALOG"  "_NET_WM_STATE_SKIP_PAGER"
+;;  "_NET_WM_WINDOW_TYPE_NORMAL"  "_NET_WM_STATE_HIDDEN"
+;;                                "_NET_WM_STATE_FULLSCREEN"
+;;              "_NET_WM_STATE_ABOVE"
+;;              "_NET_WM_STATE_BELOW"
+;;              "_NET_WM_STATE_DEMANDS_ATTENTION"
 ;;
-;;	"_NET_WM_ALLOWED_ACTIONS"
-;;	"_NET_WM_ACTION_MOVE"
-;;	"_NET_WM_ACTION_RESIZE"
-;;	"_NET_WM_ACTION_SHADE"
-;;	"_NET_WM_ACTION_STICK"
-;;	"_NET_WM_ACTION_MAXIMIZE_HORZ"
-;;	"_NET_WM_ACTION_MAXIMIZE_VERT"
-;;	"_NET_WM_ACTION_FULLSCREEN"
-;;	"_NET_WM_ACTION_CHANGE_DESKTOP"
-;;	"_NET_WM_ACTION_CLOSE"
+;;  "_NET_WM_ALLOWED_ACTIONS"
+;;  "_NET_WM_ACTION_MOVE"
+;;  "_NET_WM_ACTION_RESIZE"
+;;  "_NET_WM_ACTION_SHADE"
+;;  "_NET_WM_ACTION_STICK"
+;;  "_NET_WM_ACTION_MAXIMIZE_HORZ"
+;;  "_NET_WM_ACTION_MAXIMIZE_VERT"
+;;  "_NET_WM_ACTION_FULLSCREEN"
+;;  "_NET_WM_ACTION_CHANGE_DESKTOP"
+;;  "_NET_WM_ACTION_CLOSE"
 ;;
-;;	))
+;;  ))
 ;;
 ;;
 ;;(defun intern-atoms (display)
 ;;  (declare (type xlib:display display))
 ;;  (mapcar #'(lambda (atom-name) (xlib:intern-atom display atom-name))
-;;	  +exwm-atoms+)
+;;    +exwm-atoms+)
 ;;  (values))
 ;;
 ;;
@@ -479,18 +479,18 @@ they should be windows. So use this function to make a window out of them."
 ;;  "Returns a list of atom-name (if atom-list-p is t) otherwise returns
 ;;   a list of atom-id."
 ;;  (xlib:get-property window property-atom
-;;		     :transform (when atom-list-p
-;;				  (lambda (id)
-;;				    (xlib:atom-name (xlib:drawable-display window) id)))))
+;;         :transform (when atom-list-p
+;;          (lambda (id)
+;;            (xlib:atom-name (xlib:drawable-display window) id)))))
 ;;
 ;;(defun set-atoms-property (window atoms property-atom &key (mode :replace))
 ;;  "Sets the property designates by `property-atom'. ATOMS is a list of atom-id
 ;;   or a list of keyword atom-names."
 ;;  (xlib:change-property window property-atom atoms :ATOM 32
-;;			:mode mode
-;;			:transform (unless (integerp (car atoms))
-;;				     (lambda (atom-key)
-;;				       (xlib:find-atom (xlib:drawable-display window) atom-key)))))
+;;      :mode mode
+;;      :transform (unless (integerp (car atoms))
+;;             (lambda (atom-key)
+;;               (xlib:find-atom (xlib:drawable-display window) atom-key)))))
 ;;
 ;;
 ;;
@@ -505,7 +505,7 @@ they should be windows. So use this function to make a window out of them."
 (defun hide-window (window)
   (when window
     (setf (window-state window) +iconic-state+
-	  (xlib:window-event-mask window) (remove :structure-notify *window-events*))
+          (xlib:window-event-mask window) (remove :structure-notify *window-events*))
     (xlib:unmap-window window)
     (setf (xlib:window-event-mask window) *window-events*)))
 
@@ -552,11 +552,11 @@ they should be windows. So use this function to make a window out of them."
 (defun send-client-message (window type &rest data)
   "Send a client message to a client's window."
   (xlib:send-event window
-		   :client-message nil
-		   :window window
-		   :type type
-		   :format 32
-		   :data data))
+                   :client-message nil
+                   :window window
+                   :type type
+                   :format 32
+                   :data data))
 
 
 
@@ -618,38 +618,38 @@ they should be windows. So use this function to make a window out of them."
   (defun xgrab-init-pointer ()
     (setf pointer-grabbed nil))
 
-    (defun xgrab-pointer-p ()
-      pointer-grabbed)
+  (defun xgrab-pointer-p ()
+    pointer-grabbed)
 
-    (defun xgrab-pointer (root cursor-char cursor-mask-char
-			  &optional (pointer-mask '(:enter-window :pointer-motion
-						    :button-press :button-release)) owner-p)
-      "Grab the pointer and set the pointer shape."
-      (when pointer-grabbed
-	(xungrab-pointer))
-      (setf pointer-grabbed t)
-      (let* ((white (xlib:make-color :red 1.0 :green 1.0 :blue 1.0))
-	     (black (xlib:make-color :red 0.0 :green 0.0 :blue 0.0)))
-	(cond (cursor-char
-	       (setf cursor-font (xlib:open-font *display* "cursor")
-		     cursor (xlib:create-glyph-cursor :source-font cursor-font
-						      :source-char (or cursor-char 68)
-						      :mask-font cursor-font
-						      :mask-char (or cursor-mask-char 69)
-						      :foreground black
-						      :background white))
-	       (xlib:grab-pointer root pointer-mask
-				       :owner-p owner-p  :sync-keyboard-p nil :sync-pointer-p nil :cursor cursor))
-	      (t
-	       (xlib:grab-pointer root pointer-mask
-				       :owner-p owner-p  :sync-keyboard-p nil :sync-pointer-p nil)))))
+  (defun xgrab-pointer (root cursor-char cursor-mask-char
+                        &optional (pointer-mask '(:enter-window :pointer-motion
+                                                  :button-press :button-release)) owner-p)
+    "Grab the pointer and set the pointer shape."
+    (when pointer-grabbed
+      (xungrab-pointer))
+    (setf pointer-grabbed t)
+    (let* ((white (xlib:make-color :red 1.0 :green 1.0 :blue 1.0))
+           (black (xlib:make-color :red 0.0 :green 0.0 :blue 0.0)))
+      (cond (cursor-char
+             (setf cursor-font (xlib:open-font *display* "cursor")
+                   cursor (xlib:create-glyph-cursor :source-font cursor-font
+                                                    :source-char (or cursor-char 68)
+                                                    :mask-font cursor-font
+                                                    :mask-char (or cursor-mask-char 69)
+                                                    :foreground black
+                                                    :background white))
+             (xlib:grab-pointer root pointer-mask
+                                :owner-p owner-p  :sync-keyboard-p nil :sync-pointer-p nil :cursor cursor))
+            (t
+             (xlib:grab-pointer root pointer-mask
+                                :owner-p owner-p  :sync-keyboard-p nil :sync-pointer-p nil)))))
 
-    (defun xungrab-pointer ()
-      "Remove the grab on the cursor and restore the cursor shape."
-      (setf pointer-grabbed nil)
-      (xlib:ungrab-pointer *display*)
-      (xlib:display-finish-output *display*)
-      (free-grab-pointer)))
+  (defun xungrab-pointer ()
+    "Remove the grab on the cursor and restore the cursor shape."
+    (setf pointer-grabbed nil)
+    (xlib:ungrab-pointer *display*)
+    (xlib:display-finish-output *display*)
+    (free-grab-pointer)))
 
 
 (let ((keyboard-grabbed nil))
@@ -679,10 +679,10 @@ they should be windows. So use this function to make a window out of them."
 (defun grab-all-buttons (window)
   (ungrab-all-buttons window)
   (xlib:grab-button window :any '(:button-press :button-release :pointer-motion)
-		    :modifiers :any
-		    :owner-p nil
-		    :sync-pointer-p t
-		    :sync-keyboard-p nil))
+                    :modifiers :any
+                    :owner-p nil
+                    :sync-pointer-p t
+                    :sync-keyboard-p nil))
 
 (defun ungrab-all-keys (window)
   (xlib:ungrab-key window :any :modifiers :any))
@@ -691,15 +691,15 @@ they should be windows. So use this function to make a window out of them."
 
 (defmacro with-grab-keyboard-and-pointer ((cursor mask old-cursor old-mask &optional ungrab-main) &body body)
   `(let ((pointer-grabbed (xgrab-pointer-p))
-	 (keyboard-grabbed (xgrab-keyboard-p)))
+         (keyboard-grabbed (xgrab-keyboard-p)))
      (xgrab-pointer *root* ,cursor ,mask)
      (unless keyboard-grabbed
        (when ,ungrab-main
          (ungrab-main-keys))
        (xgrab-keyboard *root*))
      (unwind-protect
-	  (progn
-	    ,@body)
+          (progn
+            ,@body)
        (progn
          (if pointer-grabbed
              (xgrab-pointer *root* ,old-cursor ,old-mask)
@@ -760,11 +760,11 @@ they should be windows. So use this function to make a window out of them."
 
   (defun move-window (orig-window orig-x orig-y &optional additional-fn additional-arg)
     (setf window orig-window
-	  add-fn additional-fn
-	  add-arg additional-arg
-	  dx (- (x-drawable-x window) orig-x)
-	  dy (- (x-drawable-y window) orig-y)
-	  (xlib:window-border window) (get-color *color-move-window*))
+          add-fn additional-fn
+          add-arg additional-arg
+          dx (- (x-drawable-x window) orig-x)
+          dy (- (x-drawable-y window) orig-y)
+          (xlib:window-border window) (get-color *color-move-window*))
     (raise-window window)
     (with-grab-pointer ()
       (when additional-fn
@@ -774,10 +774,10 @@ they should be windows. So use this function to make a window out of them."
 
 
 (let (add-fn add-arg window
-	     o-x o-y
-	     orig-width orig-height
-	     min-width max-width
-	     min-height max-height)
+             o-x o-y
+             orig-width orig-height
+             min-width max-width
+             min-height max-height)
   (define-handler resize-window-mode :motion-notify (root-x root-y)
     (unless (compress-motion-notify)
       (if add-fn
@@ -799,17 +799,17 @@ they should be windows. So use this function to make a window out of them."
   (defun resize-window (orig-window orig-x orig-y &optional additional-fn additional-arg)
     (let* ((hints (xlib:wm-normal-hints orig-window)))
       (setf window orig-window
-	    add-fn additional-fn
-	    add-arg additional-arg
-	    o-x orig-x
-	    o-y orig-y
-	    orig-width (x-drawable-width window)
-	    orig-height (x-drawable-height window)
-	    min-width (or (and hints (xlib:wm-size-hints-min-width hints)) 0)
-	    min-height (or (and hints (xlib:wm-size-hints-min-height hints)) 0)
-	    max-width (or (and hints (xlib:wm-size-hints-max-width hints)) most-positive-fixnum)
-	    max-height (or (and hints (xlib:wm-size-hints-max-height hints)) most-positive-fixnum)
-	    (xlib:window-border window) (get-color *color-move-window*))
+            add-fn additional-fn
+            add-arg additional-arg
+            o-x orig-x
+            o-y orig-y
+            orig-width (x-drawable-width window)
+            orig-height (x-drawable-height window)
+            min-width (or (and hints (xlib:wm-size-hints-min-width hints)) 0)
+            min-height (or (and hints (xlib:wm-size-hints-min-height hints)) 0)
+            max-width (or (and hints (xlib:wm-size-hints-max-width hints)) most-positive-fixnum)
+            max-height (or (and hints (xlib:wm-size-hints-max-height hints)) most-positive-fixnum)
+            (xlib:window-border window) (get-color *color-move-window*))
       (raise-window window)
       (with-grab-pointer ()
         (when additional-fn
@@ -833,11 +833,11 @@ they should be windows. So use this function to make a window out of them."
 (let ((color-hash (make-hash-table :test 'equal)))
   (defun get-color (color)
     (multiple-value-bind (val foundp)
-	(gethash color color-hash)
+        (gethash color color-hash)
       (if foundp
-	  val
-	  (setf (gethash color color-hash)
-		(xlib:alloc-color (xlib:screen-default-colormap *screen*) color))))))
+          val
+          (setf (gethash color color-hash)
+                (xlib:alloc-color (xlib:screen-default-colormap *screen*) color))))))
 
 
 
@@ -848,10 +848,10 @@ they should be windows. So use this function to make a window out of them."
 
 (defmethod ->color ((color integer))
   (labels ((hex->float (color)
-	     (/ (logand color #xFF) 256.0)))
+             (/ (logand color #xFF) 256.0)))
     (xlib:make-color :blue (hex->float color)
-		     :green (hex->float (ash color -8))
-		     :red (hex->float  (ash color -16)))))
+                     :green (hex->float (ash color -8))
+                     :red (hex->float  (ash color -16)))))
 
 (defmethod ->color ((color list))
   (destructuring-bind (red green blue) color
@@ -885,29 +885,29 @@ they should be windows. So use this function to make a window out of them."
   (if (fboundp 'xlib:character->keysyms)
       `(xlib:character->keysyms ,ch)
       `(list
-       (case ,ch
-	 (:character-set-switch #xFF7E)
-	 (:left-shift #xFFE1)
-	 (:right-shift #xFFE2)
-	 (:left-control #xFFE3)
-	 (:right-control #xFFE4)
-	 (:caps-lock #xFFE5)
-	 (:shift-lock #xFFE6)
-	 (:left-meta #xFFE7)
-	 (:right-meta #xFFE8)
-	 (:left-alt #xFFE9)
-	 (:right-alt #xFFEA)
-	 (:left-super #xFFEB)
-	 (:right-super #xFFEC)
-	 (:left-hyper #xFFED)
-	 (:right-hyper #xFFEE)
-	 (t
-	  (etypecase ,ch
-	    (character
-	     ;; Latin-1 characters have their own value as keysym
-	     (if (< 31 (char-code ,ch) 256)
-		 (char-code ,ch)
-		 (error "Don't know how to get keysym from ~A" ,ch)))))))))
+        (case ,ch
+          (:character-set-switch #xFF7E)
+          (:left-shift #xFFE1)
+          (:right-shift #xFFE2)
+          (:left-control #xFFE3)
+          (:right-control #xFFE4)
+          (:caps-lock #xFFE5)
+          (:shift-lock #xFFE6)
+          (:left-meta #xFFE7)
+          (:right-meta #xFFE8)
+          (:left-alt #xFFE9)
+          (:right-alt #xFFEA)
+          (:left-super #xFFEB)
+          (:right-super #xFFEC)
+          (:left-hyper #xFFED)
+          (:right-hyper #xFFEE)
+          (t
+           (etypecase ,ch
+             (character
+              ;; Latin-1 characters have their own value as keysym
+              (if (< 31 (char-code ,ch) 256)
+                  (char-code ,ch)
+                  (error "Don't know how to get keysym from ~A" ,ch)))))))))
 
 
 
@@ -928,8 +928,8 @@ they should be windows. So use this function to make a window out of them."
 
 (defun keycode->keysym (code modifiers)
   (xlib:keycode->keysym *display* code (cond ((member :shift modifiers) 1)
-					     ((member :mod-5 modifiers) 4)
-					     (t 0))))
+                                             ((member :mod-5 modifiers) 4)
+                                             (t 0))))
 
 
 
@@ -938,11 +938,11 @@ they should be windows. So use this function to make a window out of them."
 (let ((modifier-list nil))
   (defun init-modifier-list ()
     (dolist (name '("Shift_L" "Shift_R" "Control_L" "Control_R"
-		    "Alt_L" "Alt_R" "Meta_L" "Meta_R" "Hyper_L" "Hyper_R"
-		    "Mode_switch" "script_switch" "ISO_Level3_Shift"
-		    "Caps_Lock" "Scroll_Lock" "Num_Lock"))
+                    "Alt_L" "Alt_R" "Meta_L" "Meta_R" "Hyper_L" "Hyper_R"
+                    "Mode_switch" "script_switch" "ISO_Level3_Shift"
+                    "Caps_Lock" "Scroll_Lock" "Num_Lock"))
       (awhen (xlib:keysym->keycodes *display* (keysym-name->keysym name))
-	(push it modifier-list))))
+        (push it modifier-list))))
 
   (defun modifier-p (code)
     (member code modifier-list)))
@@ -951,40 +951,40 @@ they should be windows. So use this function to make a window out of them."
   (with-grab-keyboard-and-pointer (66 67 66 67)
     (loop
        (let ((key (loop for k across (xlib:query-keymap *display*)
-		     for code from 0
-		     when (and (plusp k) (not (modifier-p code)))
-		     return t))
-	     (button (loop for b in (xlib:make-state-keys (nth-value 4 (xlib:query-pointer *root*)))
-			when (member b '(:button-1 :button-2 :button-3 :button-4 :button-5))
-			return t)))
-	 (when (and (not key) (not button))
-	   (loop while (xlib:event-case (*display* :discard-p t :peek-p nil :timeout 0)
-			 (:motion-notify () t)
-			 (:key-press () t)
-			 (:key-release () t)
-			 (:button-press () t)
-			 (:button-release () t)
-			 (t nil)))
-	   (return))))))
+                     for code from 0
+                     when (and (plusp k) (not (modifier-p code)))
+                     return t))
+             (button (loop for b in (xlib:make-state-keys (nth-value 4 (xlib:query-pointer *root*)))
+                        when (member b '(:button-1 :button-2 :button-3 :button-4 :button-5))
+                        return t)))
+         (when (and (not key) (not button))
+           (loop while (xlib:event-case (*display* :discard-p t :peek-p nil :timeout 0)
+                         (:motion-notify () t)
+                         (:key-press () t)
+                         (:key-release () t)
+                         (:button-press () t)
+                         (:button-release () t)
+                         (t nil)))
+           (return))))))
 
 
 (defun wait-a-key-or-button-press ()
   (with-grab-keyboard-and-pointer (24 25 66 67)
     (loop
-     (let ((key (loop for k across (xlib:query-keymap *display*)
-		      unless (zerop k) return t))
-	   (button (loop for b in (xlib:make-state-keys (nth-value 4 (xlib:query-pointer *root*)))
-			 when (member b '(:button-1 :button-2 :button-3 :button-4 :button-5))
-			 return t)))
-       (when (or key button)
-	 (return))))))
+       (let ((key (loop for k across (xlib:query-keymap *display*)
+                     unless (zerop k) return t))
+             (button (loop for b in (xlib:make-state-keys (nth-value 4 (xlib:query-pointer *root*)))
+                        when (member b '(:button-1 :button-2 :button-3 :button-4 :button-5))
+                        return t)))
+         (when (or key button)
+           (return))))))
 
 
 
 (defun compress-motion-notify ()
   (when *have-to-compress-notify*
     (loop while (xlib:event-cond (*display* :timeout 0)
-		  (:motion-notify () t)))))
+                  (:motion-notify () t)))))
 
 
 (defun display-all-cursors (&optional (display-time 1))
@@ -1014,8 +1014,8 @@ they should be windows. So use this function to make a window out of them."
 
 (defun copy-pixmap-buffer (window gc)
   (xlib:copy-area *pixmap-buffer* gc
-  		  0 0 (x-drawable-width window) (x-drawable-height window)
-  		  window 0 0))
+                  0 0 (x-drawable-width window) (x-drawable-height window)
+                  window 0 0))
 
 
 

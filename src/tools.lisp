@@ -29,101 +29,101 @@
 (defpackage tools
   (:use common-lisp)
   (:export :it
-		   :awhen
-		   :aif
+           :awhen
+           :aif
            :defconfig :*config-var-table* :configvar-value :configvar-group :config-default-value
            :config-all-groups
            :config-group->string
-		   :find-in-hash
+           :find-in-hash
            :search-in-hash
            :view-hash-table
            :copy-hash-table
-		   :nfuncall
-		   :pfuncall
+           :nfuncall
+           :pfuncall
            :symbol-search
-		   :create-symbol :create-symbol-in-package
-		   :call-hook
+           :create-symbol :create-symbol-in-package
+           :call-hook
            :add-new-hook
-		   :add-hook
-		   :remove-hook
-		   :clear-timers
-		   :add-timer
-		   :at
-		   :with-timer
-		   :process-timers
-		   :erase-timer
-		   :timer-loop
-		   :dbg
-		   :dbgnl
-		   :dbgc
+           :add-hook
+           :remove-hook
+           :clear-timers
+           :add-timer
+           :at
+           :with-timer
+           :process-timers
+           :erase-timer
+           :timer-loop
+           :dbg
+           :dbgnl
+           :dbgc
            :make-rectangle
            :rectangle-x :rectangle-y :rectangle-width :rectangle-height
            :in-rectangle
            :distance
            :collect-all-symbols
-		   :with-all-internal-symbols
-		   :export-all-functions :export-all-variables
-		   :export-all-functions-and-variables
-		   :ensure-function
-		   :empty-string-p
-		   :find-common-string
+           :with-all-internal-symbols
+           :export-all-functions :export-all-variables
+           :export-all-functions-and-variables
+           :ensure-function
+           :empty-string-p
+           :find-common-string
            :command-in-path
-		   :setf/=
-		   :number->char
+           :setf/=
+           :number->char
            :number->string
            :number->letter
-		   :simple-type-of
-		   :repeat-chars
-		   :nth-insert
-		   :split-string
+           :simple-type-of
+           :repeat-chars
+           :nth-insert
+           :split-string
            :substring-equal
            :string-match
            :extended-alphanumericp
-		   :append-newline-space
-		   :expand-newline
-		   :ensure-list
-		   :ensure-printable
-		   :limit-length
-		   :ensure-n-elems
-		   :begin-with-2-spaces
-		   :string-equal-p
-		   :find-assoc-word
-		   :print-space
-		   :escape-string
-		   :first-position
-		   :find-free-number
-		   :date-string
+           :append-newline-space
+           :expand-newline
+           :ensure-list
+           :ensure-printable
+           :limit-length
+           :ensure-n-elems
+           :begin-with-2-spaces
+           :string-equal-p
+           :find-assoc-word
+           :print-space
+           :escape-string
+           :first-position
+           :find-free-number
+           :date-string
            :write-backtrace
-		   :do-execute
-		   :do-shell :fdo-shell :do-shell-output
-		   :getenv
-		   :uquit
-		   :urun-prog
-		   :ushell
-		   :ush
-		   :ushell-loop
-		   :cldebug
-		   :get-command-line-words
-		   :string-to-list
-		   :near-position
-		   :string-to-list-multichar
-		   :list-to-string
-		   :list-to-string-list
-		   :clean-string
-		   :one-in-list
-		   :exchange-one-in-list
-		   :rotate-list
-		   :anti-rotate-list
+           :do-execute
+           :do-shell :fdo-shell :do-shell-output
+           :getenv
+           :uquit
+           :urun-prog
+           :ushell
+           :ush
+           :ushell-loop
+           :cldebug
+           :get-command-line-words
+           :string-to-list
+           :near-position
+           :string-to-list-multichar
+           :list-to-string
+           :list-to-string-list
+           :clean-string
+           :one-in-list
+           :exchange-one-in-list
+           :rotate-list
+           :anti-rotate-list
            :n-rotate-list
-		   :append-formated-list
-		   :shuffle-list
-		   :parse-integer-in-list
-		   :convert-to-number
-		   :next-in-list :prev-in-list
-		   :find-string
-		   :find-all-strings
-		   :subst-strings
-		   :test-find-string
+           :append-formated-list
+           :shuffle-list
+           :parse-integer-in-list
+           :convert-to-number
+           :next-in-list :prev-in-list
+           :find-string
+           :find-all-strings
+           :subst-strings
+           :test-find-string
            :memory-usage
            :cpu-usage
            :battery-usage
@@ -189,9 +189,9 @@
 (defun find-in-hash (val hashtable &optional (test #'equal))
   "Return the key associated to val in the hashtable"
   (maphash #'(lambda (k v)
-	       (when (and (consp v) (funcall test (first v) val))
-		 (return-from find-in-hash (values k v))))
-	   hashtable))
+               (when (and (consp v) (funcall test (first v) val))
+                 (return-from find-in-hash (values k v))))
+           hashtable))
 
 (defun search-in-hash (val hashtable)
   "Return the key who match the val in the hashtable"
@@ -221,8 +221,8 @@
 
 (defun pfuncall (function &rest args)
   (when (and function
-	     (or (functionp function)
-		 (and (symbolp function) (fboundp function))))
+             (or (functionp function)
+                 (and (symbolp function) (fboundp function))))
     (apply function args)))
 
 
@@ -235,7 +235,7 @@
   (defun mkstr (&rest args)
     (with-output-to-string (s)
       (dolist (a args)
-	(princ a s))))
+        (princ a s))))
 
   (defun create-symbol (&rest args)
     (values (intern (string-upcase (apply #'mkstr args)))))
@@ -252,12 +252,12 @@
 Return the result of the last hook"
   (let ((result nil))
     (labels ((rec (hook)
-	       (when hook
-		 (typecase hook
-		   (cons (dolist (h hook)
-			   (rec h)))
+               (when hook
+                 (typecase hook
+                   (cons (dolist (h hook)
+                           (rec h)))
                    (function (setf result (apply hook args)))
-		   (symbol (when (fboundp hook)
+                   (symbol (when (fboundp hook)
                              (setf result (apply hook args))))))))
       (rec hook)
       result)))
@@ -282,7 +282,7 @@ Return the result of the last hook"
 (defmacro remove-hook (hook &rest value)
   (let ((i (gensym)))
     `(dolist (,i (list ,@value) ,hook)
-      (setf ,hook (remove ,i ,hook)))))
+       (setf ,hook (remove ,i ,hook)))))
 
 
 ;;;,-----
@@ -305,12 +305,12 @@ Return the result of the last hook"
 (defun add-timer (delay fun &optional (id (gensym)))
   "Start the function fun at delay seconds."
   (push (list id
-	      (let ((time (+ (get-internal-real-time) (s->realtime delay))))
-		(lambda (current-time)
-		  (when (>= current-time time)
-		    (funcall fun)
-		    t))))
-	*timer-list*)
+              (let ((time (+ (get-internal-real-time) (s->realtime delay))))
+                (lambda (current-time)
+                  (when (>= current-time time)
+                    (funcall fun)
+                    t))))
+        *timer-list*)
   id)
 
 (defun at (delay fun &optional (id (gensym)))
@@ -320,9 +320,9 @@ Return the result of the last hook"
 (defmacro with-timer ((delay &optional (id '(gensym))) &body body)
   "Same thing as add-timer but with syntaxic sugar"
   `(add-timer ,delay
-	      (lambda ()
-		,@body)
-	      ,id))
+              (lambda ()
+                ,@body)
+              ,id))
 
 
 (defun process-timers ()
@@ -365,16 +365,16 @@ Return the result of the last hook"
 (defmacro dbg (&rest forms)
   `(progn
      ,@(mapcar #'(lambda (form)
-		   (typecase form
-		     (string `(setf *%dbg-name%* ,form))
-		     (number `(setf *%dbg-count%* ,form))))
-	       forms)
+                   (typecase form
+                     (string `(setf *%dbg-name%* ,form))
+                     (number `(setf *%dbg-count%* ,form))))
+               forms)
      (format t "~&DEBUG[~A - ~A]  " (incf *%dbg-count%*) *%dbg-name%*)
      ,@(mapcar #'(lambda (form)
-		   (typecase form
-		     ((or string number) nil)
-		     (t `(format t "~A=~S   " ',form ,form))))
-	       forms)
+                   (typecase form
+                     ((or string number) nil)
+                     (t `(format t "~A=~S   " ',form ,form))))
+               forms)
      (format t "~%")
      (force-output)
      ,@forms))
@@ -382,16 +382,16 @@ Return the result of the last hook"
 (defmacro dbgnl (&rest forms)
   `(progn
      ,@(mapcar #'(lambda (form)
-		   (typecase form
-		     (string `(setf *%dbg-name%* ,form))
-		     (number `(setf *%dbg-count%* ,form))))
-	       forms)
+                   (typecase form
+                     (string `(setf *%dbg-name%* ,form))
+                     (number `(setf *%dbg-count%* ,form))))
+               forms)
      (format t "~&DEBUG[~A - ~A] --------------------~%" (incf *%dbg-count%*) *%dbg-name%*)
      ,@(mapcar #'(lambda (form)
-		   (typecase form
-		     ((or string number) nil)
-		     (t `(format t "  -  ~A=~S~%" ',form ,form))))
-	       forms)
+                   (typecase form
+                     ((or string number) nil)
+                     (t `(format t "  -  ~A=~S~%" ',form ,form))))
+               forms)
      (force-output)
      ,@forms))
 
@@ -432,17 +432,17 @@ Return the result of the last hook"
   "Bind symbol to all internal symbols in package"
   `(do-symbols (,var ,package)
      (multiple-value-bind (sym status)
-	 (find-symbol (symbol-name ,var) ,package)
+         (find-symbol (symbol-name ,var) ,package)
        (declare (ignore sym))
        (when (eql status :internal)
-	 ,@body))))
+         ,@body))))
 
 
 (defun export-all-functions (package &optional (verbose nil))
   (with-all-internal-symbols (symbol package)
     (when (fboundp symbol)
       (when verbose
-	(format t "Exporting ~S~%" symbol))
+        (format t "Exporting ~S~%" symbol))
       (export symbol package))))
 
 
@@ -450,14 +450,14 @@ Return the result of the last hook"
   (with-all-internal-symbols (symbol package)
     (when (boundp symbol)
       (when verbose
-	(format t "Exporting ~S~%" symbol))
+        (format t "Exporting ~S~%" symbol))
       (export symbol package))))
 
 (defun export-all-functions-and-variables (package &optional (verbose nil))
   (with-all-internal-symbols (symbol package)
     (when (or (fboundp symbol) (boundp symbol))
       (when verbose
-	(format t "Exporting ~S~%" symbol))
+        (format t "Exporting ~S~%" symbol))
       (export symbol package))))
 
 
@@ -478,13 +478,13 @@ Return the result of the last hook"
   "Return the string in common in all string in list"
   (if list
       (let ((result (remove-if-not (lambda (x)
-				     (zerop (or (search string x :test #'string-equal) -1)))
-				   list)))
-	(if (= (length result) (length list))
-	    (if (> (length (first list)) (length string))
-		(find-common-string (subseq (first list) 0 (1+ (length string))) list string)
-		string)
-	    orig))
+                                     (zerop (or (search string x :test #'string-equal) -1)))
+                                   list)))
+        (if (= (length result) (length list))
+            (if (> (length (first list)) (length string))
+                (find-common-string (subseq (first list) 0 (1+ (length string))) list string)
+                string)
+            orig))
       string))
 
 
@@ -513,7 +513,7 @@ Return the result of the last hook"
   (let ((gval (gensym)))
     `(let ((,gval ,val))
        (when (/= ,var ,gval)
-	 (setf ,var ,gval)))))
+         (setf ,var ,gval)))))
 
 
 (defun number->char (number)
@@ -551,8 +551,8 @@ Return the result of the last hook"
 (defun nth-insert (n elem list)
   "Insert elem in (nth n list)"
   (nconc (subseq list 0 n)
-	 (list elem)
-	 (subseq list n)))
+         (list elem)
+         (subseq list n)))
 
 
 
@@ -582,17 +582,17 @@ Return the result of the last hook"
   "Is the character an alphanumeric or one of the following characters: -, _,
 ., +, =, *, :, %."
   (some (lambda (c)
-		  (char= c char))
-		'(#\- #\_ #\. #\+ #\= #\* #\: #\%)))
+          (char= c char))
+        '(#\- #\_ #\. #\+ #\= #\* #\: #\%)))
 
 
 (defun append-newline-space (string)
   "Append spaces before Newline on each line"
   (with-output-to-string (stream)
     (loop for c across string do
-	 (when (equal c #\Newline)
-	   (princ " " stream))
-	 (princ c stream))))
+         (when (equal c #\Newline)
+           (princ " " stream))
+         (princ c stream))))
 
 
 (defun expand-newline (list)
@@ -621,8 +621,8 @@ Return the result of the last hook"
   "Ensure that list has exactly n elements"
   (let ((length (length list)))
     (cond ((= length n) list)
-	  ((< length n) (ensure-n-elems (append list '(nil)) n))
-	  ((> length n) (ensure-n-elems (butlast list) n)))))
+          ((< length n) (ensure-n-elems (append list '(nil)) n))
+          ((> length n) (ensure-n-elems (butlast list) n)))))
 
 (defun begin-with-2-spaces (string)
   (and (> (length string) 1)
@@ -638,8 +638,8 @@ Return the result of the last hook"
 (defun find-assoc-word (word line &optional (delim #\"))
   "Find a word pair"
   (let* ((pos (search word line))
-	 (pos-1 (position delim line :start (or pos 0)))
-	 (pos-2 (position delim line :start (1+ (or pos-1 0)))))
+         (pos-1 (position delim line :start (or pos 0)))
+         (pos-2 (position delim line :start (1+ (or pos-1 0)))))
     (when (and pos pos-1 pos-2)
       (subseq line (1+ pos-1) pos-2))))
 
@@ -663,19 +663,19 @@ Return the result of the last hook"
   (zerop (or (search word string) -1)))
 
 
-(defun find-free-number (l)		; stolen from stumpwm - thanks
+(defun find-free-number (l)   ; stolen from stumpwm - thanks
   "Return a number that is not in the list l."
   (let* ((nums (sort l #'<))
-	 (new-num (loop for n from 0 to (or (car (last nums)) 0)
-		     for i in nums
-		     when (/= n i)
-		     do (return n))))
+         (new-num (loop for n from 0 to (or (car (last nums)) 0)
+                     for i in nums
+                     when (/= n i)
+                     do (return n))))
     (if new-num
-	new-num
-	;; there was no space between the numbers, so use the last + 1
-	(if (car (last nums))
-	    (1+ (car (last nums)))
-	    0))))
+        new-num
+        ;; there was no space between the numbers, so use the last + 1
+        (if (car (last nums))
+            (1+ (car (last nums)))
+            0))))
 
 
 
@@ -699,28 +699,28 @@ of the program to return.
               (ext:process-input proc)))
     #+:clisp (ext:run-program program :arguments args :input io :output io :wait wt)
     #+:sbcl (let ((proc (sb-ext:run-program program args :input :stream :output :stream :wait wt)))
-	      (unless proc
-		(error "Cannot create process."))
-	      (make-two-way-stream
-	       (sb-ext:process-output proc)
-	       (sb-ext:process-input proc)))
+              (unless proc
+                (error "Cannot create process."))
+              (make-two-way-stream
+               (sb-ext:process-output proc)
+               (sb-ext:process-input proc)))
     #+:lispworks (system:open-pipe fullstring :direction :io)
     #+:allegro (let ((proc (excl:run-shell-command
-			    (apply #'vector program program args)
-			    :input :stream :output :stream :wait wt)))
-		 (unless proc
-		   (error "Cannot create process."))
-		 proc)
+                            (apply #'vector program program args)
+                            :input :stream :output :stream :wait wt)))
+                 (unless proc
+                   (error "Cannot create process."))
+                 proc)
     #+:ecl (ext:run-program program args :input :stream :output :stream
                             :error :output)
     #+:openmcl (let ((proc (ccl:run-program program args :input
-							 :stream :output
-							 :stream :wait wt)))
-		 (unless proc
-		   (error "Cannot create process."))
-		 (make-two-way-stream
-		  (ccl:external-process-output-stream proc)
-		  (ccl:external-process-input-stream proc)))))
+                                            :stream :output
+                                            :stream :wait wt)))
+                 (unless proc
+                   (error "Cannot create process."))
+                 (make-two-way-stream
+                  (ccl:external-process-output-stream proc)
+                  (ccl:external-process-input-stream proc)))))
 
 (defun do-shell (program &optional args (wait nil) (io :stream))
   (do-execute "/bin/sh" `("-c" ,program ,@args) wait io))
@@ -759,7 +759,7 @@ of the program to return.
   #+clisp (setf (ext:getenv (string var)) (string val))
   #+(or cmu scl)
   (let ((cell (assoc (string var) ext:*environment-list* :test #'equalp
-							 :key #'string)))
+                     :key #'string)))
     (if cell
         (setf (cdr cell) (string val))
         (push (cons (intern (string var) "KEYWORD") (string val))
@@ -850,8 +850,8 @@ Useful for re-using the &REST arg after removing some options."
 
 (defun set-shell-dispatch (&optional (shell-fun 'ushell))
   (labels ((|shell-reader| (stream subchar arg)
-	     (declare (ignore subchar arg))
-	     (list shell-fun (read stream t nil t))))
+             (declare (ignore subchar arg))
+             (list shell-fun (read stream t nil t))))
     (set-dispatch-macro-character #\# #\# #'|shell-reader|)))
 
 
@@ -860,11 +860,11 @@ Useful for re-using the &REST arg after removing some options."
      (format t "UNI-SHELL> ")
      (let* ((line (read-line)))
        (cond ((zerop (or (search "quit" line) -1)) (return))
-	     ((zerop (or (position #\! line) -1))
-	      (funcall shell-fun (subseq line 1)))
-	     (t (format t "~{~A~^ ;~%~}~%"
-			(multiple-value-list
-			 (ignore-errors (eval (read-from-string line))))))))))
+             ((zerop (or (position #\! line) -1))
+              (funcall shell-fun (subseq line 1)))
+             (t (format t "~{~A~^ ;~%~}~%"
+                        (multiple-value-list
+                         (ignore-errors (eval (read-from-string line))))))))))
 
 
 
@@ -895,57 +895,57 @@ Useful for re-using the &REST arg after removing some options."
 
 (defun string-to-list (str &key (split-char #\space))
   (do* ((start 0 (1+ index))
-	(index (position split-char str :start start)
-	       (position split-char str :start start))
-	(accum nil))
+        (index (position split-char str :start start)
+               (position split-char str :start start))
+        (accum nil))
        ((null index)
-	(unless (string= (subseq str start) "")
-	  (push (subseq str start) accum))
-	(nreverse accum))
+        (unless (string= (subseq str start) "")
+          (push (subseq str start) accum))
+        (nreverse accum))
     (when (/= start index)
       (push (subseq str start index) accum))))
 
 
 (defun near-position (chars str &key (start 0))
   (do* ((char chars (cdr char))
-	(pos (position (car char) str :start start)
-	     (position (car char) str :start start))
-	(ret (when pos pos)
-	     (if pos
-		 (if ret
-		     (if (< pos ret)
-			 pos
-			 ret)
-		     pos)
-		 ret)))
+        (pos (position (car char) str :start start)
+             (position (car char) str :start start))
+        (ret (when pos pos)
+             (if pos
+                 (if ret
+                     (if (< pos ret)
+                         pos
+                         ret)
+                     pos)
+                 ret)))
        ((null char) ret)))
 
 
 ;;;(defun near-position2 (chars str &key (start 0))
 ;;;  (loop for i in chars
-;;;	minimize (position i str :start start)))
+;;; minimize (position i str :start start)))
 
 ;;(format t "~S~%" (near-position '(#\! #\. #\Space #\;) "klmsqk ppii;dsdsqkl.jldfksj lkm" :start 0))
 ;;(format t "~S~%" (near-position '(#\Space) "klmsqk ppii;dsdsqkl.jldfksj lkm" :start 0))
 ;;(format t "~S~%" (near-position '(#\; #\l #\m) "klmsqk ppii;dsdsqkl.jldfksj lkm" :start 0))
 ;;(format t "result=~S~%" (string-to-list-multichar "klmsqk ppii;dsdsqkl.jldfksj lkm" :preserve t))
 ;;(format t "result=~S~%" (string-to-list-multichar "klmsqk ppii;dsd!sqkl.jldfksj lkm"
-;;						  :split-chars '(#\k  #\! #\. #\; #\m)
-;;						  :preserve nil))
+;;              :split-chars '(#\k  #\! #\. #\; #\m)
+;;              :preserve nil))
 
 
 (defun string-to-list-multichar (str &key (split-chars '(#\space)) (preserve nil))
   (do* ((start 0 (1+ index))
-	(index (near-position split-chars str :start start)
-	       (near-position split-chars str :start start))
-	(accum nil))
+        (index (near-position split-chars str :start start)
+               (near-position split-chars str :start start))
+        (accum nil))
        ((null index)
-	(unless (string= (subseq str start) "")
-	  (push (subseq str start) accum))
-	(nreverse accum))
+        (unless (string= (subseq str start) "")
+          (push (subseq str start) accum))
+        (nreverse accum))
     (let ((retstr (subseq str start (if preserve (1+ index) index))))
       (unless (string= retstr "")
-	(push retstr accum)))))
+        (push retstr accum)))))
 
 
 
@@ -966,7 +966,7 @@ Useful for re-using the &REST arg after removing some options."
 
 (defun exchange-one-in-list (lst1 lst2)
   (let ((elem1 (one-in-list lst1))
-	(elem2 (one-in-list lst2)))
+        (elem2 (one-in-list lst2)))
     (setf lst1 (append (remove elem1 lst1) (list elem2)))
     (setf lst2 (append (remove elem2 lst2) (list elem1)))
     (values lst1 lst2)))
@@ -988,27 +988,27 @@ Useful for re-using the &REST arg after removing some options."
 
 
 (defun append-formated-list (base-str
-			     lst
-			     &key (test-not-fun #'(lambda (x) x nil))
-			     (print-fun #'(lambda (x) x))
-			     (default-str ""))
+                             lst
+                             &key (test-not-fun #'(lambda (x) x nil))
+                               (print-fun #'(lambda (x) x))
+                               (default-str ""))
   (let ((str base-str) (first t))
     (dolist (i lst)
       (cond ((funcall test-not-fun i) nil)
-	    (t (setq str
-		     (concatenate 'string str
-				  (if first "" ", ")
-				  (format nil "~A"
-					  (funcall print-fun i))))
-	       (setq first nil))))
+            (t (setq str
+                     (concatenate 'string str
+                                  (if first "" ", ")
+                                  (format nil "~A"
+                                          (funcall print-fun i))))
+               (setq first nil))))
     (if (string= base-str str)
-	(concatenate 'string str default-str) str)))
+        (concatenate 'string str default-str) str)))
 
 
 (defun shuffle-list (list &key (time 1))
   "Shuffle a list by swapping elements time times"
   (let ((result (copy-list list))
-	(ind1 0) (ind2 0) (swap 0))
+        (ind1 0) (ind2 0) (swap 0))
     (dotimes (i time)
       (setf ind1 (random (length result)))
       (setf ind2 (random (length result)))
@@ -1022,7 +1022,7 @@ Useful for re-using the &REST arg after removing some options."
 
 (defun convert-to-number (str)
   (cond ((stringp str) (parse-integer str :junk-allowed t))
-	((numberp str) str)))
+        ((numberp str) str)))
 
 (defun parse-integer-in-list (lst)
   "Convert all integer string in lst to integer"
@@ -1042,20 +1042,20 @@ Useful for re-using the &REST arg after removing some options."
 
 (let ((jours '("Lundi" "Mardi" "Mercredi" "Jeudi" "Vendredi" "Samedi" "Dimanche"))
       (mois '("Janvier" "Fevrier" "Mars" "Avril" "Mai" "Juin" "Juillet"
-	      "Aout" "Septembre" "Octobre" "Novembre" "Decembre"))
+              "Aout" "Septembre" "Octobre" "Novembre" "Decembre"))
       (days '("Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" "Sunday"))
       (months '("January" "February" "March" "April" "May" "June" "July"
-		 "August" "September" "October" "November" "December")))
+                "August" "September" "October" "November" "December")))
   (defun date-string ()
     (multiple-value-bind (second minute hour date month year day)
-	(get-decoded-time)
+        (get-decoded-time)
       (if (search "fr" (getenv "LANG") :test #'string-equal)
-	  (format nil "   ~2,'0D:~2,'0D:~2,'0D    ~A ~2,'0D ~A ~A "
-		  hour minute second
-		  (nth day jours) date (nth (1- month) mois) year)
-	  (format nil "   ~2,'0D:~2,'0D:~2,'0D    ~A ~A ~2,'0D ~A "
-		  hour minute second
-		  (nth day days) (nth (1- month) months) date year)))))
+          (format nil "   ~2,'0D:~2,'0D:~2,'0D    ~A ~2,'0D ~A ~A "
+                  hour minute second
+                  (nth day jours) date (nth (1- month) mois) year)
+          (format nil "   ~2,'0D:~2,'0D:~2,'0D    ~A ~A ~2,'0D ~A "
+                  hour minute second
+                  (nth day days) (nth (1- month) months) date year)))))
 
 ;;;
 ;;; Backtrace function
@@ -1093,8 +1093,8 @@ Useful for re-using the &REST arg after removing some options."
 
 (defmacro with-search-line ((word line) &body body)
   `(let ((pos (search ,word ,line :test #'string-equal)))
-    (when (>= (or pos -1) 0)
-      ,@body)))
+     (when (>= (or pos -1) 0)
+       ,@body)))
 
 (defun extract-battery-usage (line)
   (with-search-line ("Battery" line)

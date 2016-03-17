@@ -55,37 +55,37 @@
   "Replace matching parentheses with brackets"
   (let ((string (copy-seq orig-string)))
     (labels ((have-to-find-right? ()
-	       (and (< pos (length string)) (char= (aref string pos) #\()))
-	     (have-to-find-left? ()
-	       (and (> (1- pos) 0) (char= (aref string (1- pos)) #\))))
-	     (pos-right ()
-	       (loop :for p :from (1+ pos) :below (length string)
-		  :with level = 1   :for c = (aref string p)
-		  :do (when (char= c #\() (incf level))
-		  (when (char= c #\)) (decf level))
-		  (when (= level 0) (return p))))
-	     (pos-left ()
-	       (loop :for p :from (- pos 2) :downto 0
-		  :with level = 1   :for c = (aref string p)
-		  :do (when (char= c #\() (decf level))
-		  (when (char= c #\)) (incf level))
-		  (when (= level 0) (return p))))
-	     (draw-bloc (p &optional (color *query-parent-color*))
-	       (setf (xlib:gcontext-foreground *query-gc*) (get-color color))
-	       (xlib:draw-rectangle *pixmap-buffer* *query-gc*
-				    (+ 10 (* p (xlib:max-char-width *query-font*)) dec)
-				    (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*) 7)
-				    (xlib:max-char-width *query-font*)
-				    (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*))
-				    t)))
+               (and (< pos (length string)) (char= (aref string pos) #\()))
+             (have-to-find-left? ()
+               (and (> (1- pos) 0) (char= (aref string (1- pos)) #\))))
+             (pos-right ()
+               (loop :for p :from (1+ pos) :below (length string)
+                  :with level = 1   :for c = (aref string p)
+                  :do (when (char= c #\() (incf level))
+                  (when (char= c #\)) (decf level))
+                  (when (= level 0) (return p))))
+             (pos-left ()
+               (loop :for p :from (- pos 2) :downto 0
+                  :with level = 1   :for c = (aref string p)
+                  :do (when (char= c #\() (decf level))
+                  (when (char= c #\)) (incf level))
+                  (when (= level 0) (return p))))
+             (draw-bloc (p &optional (color *query-parent-color*))
+               (setf (xlib:gcontext-foreground *query-gc*) (get-color color))
+               (xlib:draw-rectangle *pixmap-buffer* *query-gc*
+                                    (+ 10 (* p (xlib:max-char-width *query-font*)) dec)
+                                    (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*) 7)
+                                    (xlib:max-char-width *query-font*)
+                                    (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*))
+                                    t)))
       (cond ((have-to-find-left?) (let ((p (pos-left)))
-				    (if p
-					(progn (draw-bloc p) (draw-bloc (1- pos)))
-					(draw-bloc (1- pos) *query-parent-error-color*))))
-	    ((have-to-find-right?) (let ((p (pos-right)))
-				     (if p
-					 (progn (draw-bloc p) (draw-bloc pos))
-					 (draw-bloc pos *query-parent-error-color*))))))))
+                                    (if p
+                                        (progn (draw-bloc p) (draw-bloc (1- pos)))
+                                        (draw-bloc (1- pos) *query-parent-error-color*))))
+            ((have-to-find-right?) (let ((p (pos-right)))
+                                     (if p
+                                         (progn (draw-bloc p) (draw-bloc pos))
+                                         (draw-bloc pos *query-parent-error-color*))))))))
 
 
 (defun clear-query-history ()
@@ -119,15 +119,15 @@
 
 (defun query-print-string ()
   (let ((dec (min 0 (- (- (x-drawable-width *query-window*) 10)
-		       (+ 10 (* *query-pos* (xlib:max-char-width *query-font*))))))
+                       (+ 10 (* *query-pos* (xlib:max-char-width *query-font*))))))
         (complet (if *query-completion-state*
                      (first *query-completion-state*)
                      (query-find-complet-list))))
     (clear-pixmap-buffer *query-window* *query-gc*)
     (setf (xlib:gcontext-foreground *query-gc*) (get-color *query-message-color*))
     (xlib:draw-glyphs *pixmap-buffer* *query-gc* 5 (+ (xlib:max-char-ascent *query-font*) 5)
-		      (format nil "~A ~{~A~^, ~}" *query-message*
-			      (if (< (length complet) *query-max-complet-length*)
+                      (format nil "~A ~{~A~^, ~}" *query-message*
+                              (if (< (length complet) *query-max-complet-length*)
                                   complet nil)))
     (when (< *query-pos* 0)
       (setf *query-pos* 0))
@@ -136,15 +136,15 @@
     (query-show-paren *query-string* *query-pos* dec)
     (setf (xlib:gcontext-foreground *query-gc*) (get-color *query-foreground*))
     (xlib:draw-glyphs *pixmap-buffer* *query-gc*
-		      (+ 10 dec)
-		      (+ (* 2 (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*))) 5)
-		      (ensure-printable *query-string*))
+                      (+ 10 dec)
+                      (+ (* 2 (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*))) 5)
+                      (ensure-printable *query-string*))
     (setf (xlib:gcontext-foreground *query-gc*) (get-color *query-cursor-color*))
     (xlib:draw-line *pixmap-buffer* *query-gc*
-		    (+ 10 (* *query-pos* (xlib:max-char-width *query-font*)) dec)
-		    (+ (* 2 (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*))) 6)
-		    (+ 10 (* *query-pos* (xlib:max-char-width *query-font*)) dec)
-		    (+ (* 1 (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*))) 7))
+                    (+ 10 (* *query-pos* (xlib:max-char-width *query-font*)) dec)
+                    (+ (* 2 (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*))) 6)
+                    (+ 10 (* *query-pos* (xlib:max-char-width *query-font*)) dec)
+                    (+ (* 1 (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*))) 7))
     (copy-pixmap-buffer *query-window* *query-gc*)))
 
 
@@ -152,22 +152,22 @@
 (defun query-enter-function ()
   (setf *query-font* (xlib:open-font *display* *query-font-string*))
   (let ((width (- (screen-width) 2))
-	(height (* 3 (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*)))))
+        (height (* 3 (+ (xlib:max-char-ascent *query-font*) (xlib:max-char-descent *query-font*)))))
     (with-placement (*query-mode-placement* x y width height)
       (setf *query-window* (xlib:create-window :parent *root*
-					       :x x :y y
-					       :width width
-					       :height height
-					       :background (get-color *query-background*)
-					       :border-width *border-size*
-					       :border (get-color *query-border*)
-					       :colormap (xlib:screen-default-colormap *screen*)
-					       :event-mask '(:exposure :key-press))
-	    *query-gc* (xlib:create-gcontext :drawable *query-window*
-					     :foreground (get-color *query-foreground*)
-					     :background (get-color *query-background*)
-					     :font *query-font*
-					     :line-style :solid))
+                                               :x x :y y
+                                               :width width
+                                               :height height
+                                               :background (get-color *query-background*)
+                                               :border-width *border-size*
+                                               :border (get-color *query-border*)
+                                               :colormap (xlib:screen-default-colormap *screen*)
+                                               :event-mask '(:exposure :key-press))
+            *query-gc* (xlib:create-gcontext :drawable *query-window*
+                                             :foreground (get-color *query-foreground*)
+                                             :background (get-color *query-background*)
+                                             :font *query-font*
+                                             :line-style :solid))
       (setf (window-transparency *query-window*) *query-transparency*)
       (map-window *query-window*)
       (query-print-string)
@@ -183,11 +183,11 @@
 
 
 (labels ((generic-backspace (del-pos)
-	   (when (>= del-pos 0)
-	     (setf *query-string* (concatenate 'string
-					       (subseq *query-string* 0 del-pos)
-					       (subseq *query-string* *query-pos*))
-		   *query-pos* del-pos))))
+           (when (>= del-pos 0)
+             (setf *query-string* (concatenate 'string
+                                               (subseq *query-string* 0 del-pos)
+                                               (subseq *query-string* *query-pos*))
+                   *query-pos* del-pos))))
   (defun query-backspace ()
     "Delete a character backward"
     (generic-backspace (1- *query-pos*)))
@@ -201,10 +201,10 @@
     (generic-backspace 0)))
 
 (labels ((generic-delete (del-pos)
-	   (when (<= del-pos (length *query-string*))
-	     (setf *query-string* (concatenate 'string
-					      (subseq *query-string* 0 *query-pos*)
-					      (subseq *query-string* del-pos))))))
+           (when (<= del-pos (length *query-string*))
+             (setf *query-string* (concatenate 'string
+                                               (subseq *query-string* 0 *query-pos*)
+                                               (subseq *query-string* del-pos))))))
   (defun query-delete ()
     "Delete a character forward"
     (generic-delete (1+ *query-pos*)))
@@ -212,7 +212,7 @@
   (defun query-delete-word ()
     "Delete a word forward"
     (generic-delete (1+ (or (position #\Space *query-string* :start *query-pos*)
-			    (1- (length *query-string*)))))))
+                            (1- (length *query-string*)))))))
 
 
 
@@ -234,9 +234,9 @@
   "Move cursor to left word"
   (when (> *query-pos* 0)
     (setf *query-pos* (let ((p (position #\Space *query-string*
-					 :end (min (1- *query-pos*) (length *query-string*))
-					 :from-end t)))
-			(if p p 0)))))
+                                         :end (min (1- *query-pos*) (length *query-string*))
+                                         :from-end t)))
+                        (if p p 0)))))
 
 (defun query-right ()
   "Move cursor to right"
@@ -247,21 +247,21 @@
   "Move cursor to right word"
   (when (< *query-pos* (length *query-string*))
     (setf *query-pos* (let ((p (position #\Space *query-string*
-					 :start (min (1+ *query-pos*) (length *query-string*)))))
-			(if p p (length *query-string*))))))
+                                         :start (min (1+ *query-pos*) (length *query-string*)))))
+                        (if p p (length *query-string*))))))
 
 (defun query-previous-history ()
   "Circulate backward in history"
-  (setf	*query-string* (first *query-history*)
-	*query-pos* (length *query-string*)
-	*query-history* (rotate-list *query-history*)))
+  (setf *query-string* (first *query-history*)
+        *query-pos* (length *query-string*)
+        *query-history* (rotate-list *query-history*)))
 
 
 (defun query-next-history ()
   "Circulate forward in history"
-  (setf	*query-string* (first *query-history*)
-	*query-pos* (length *query-string*)
-	*query-history* (anti-rotate-list *query-history*)))
+  (setf *query-string* (first *query-history*)
+        *query-pos* (length *query-string*)
+        *query-history* (anti-rotate-list *query-history*)))
 
 
 
@@ -290,25 +290,25 @@
 
 (defun query-mode-complete-suggest ()
   (flet ((complete (completions completion-pos pos initial-pos)
-	   (when completions
-	     (let ((completion (if (equal completion-pos (list-length completions))
-				   (subseq *query-string* pos initial-pos)
-				   (nth completion-pos completions))))
-	       (setf *query-string* (concatenate 'string
-						 (subseq *query-string* 0 pos)
-						 completion
-						 (subseq *query-string* *query-pos*))
-		     *query-pos* (+ pos (length completion))))
-	     (setf *query-completion-state*
-		   (list completions completion-pos pos initial-pos)))))
+           (when completions
+             (let ((completion (if (equal completion-pos (list-length completions))
+                                   (subseq *query-string* pos initial-pos)
+                                   (nth completion-pos completions))))
+               (setf *query-string* (concatenate 'string
+                                                 (subseq *query-string* 0 pos)
+                                                 completion
+                                                 (subseq *query-string* *query-pos*))
+                     *query-pos* (+ pos (length completion))))
+             (setf *query-completion-state*
+                   (list completions completion-pos pos initial-pos)))))
     (if *query-completion-state*
-	(complete (first *query-completion-state*)
-		  (mod (1+ (second *query-completion-state*))
-		       (1+ (list-length (first *query-completion-state*))))
-		  (third *query-completion-state*)
-		  (fourth *query-completion-state*))
-	(multiple-value-bind (comps pos) (query-find-complet-list)
-	  (complete comps 0 pos *query-pos*)))))
+        (complete (first *query-completion-state*)
+                  (mod (1+ (second *query-completion-state*))
+                       (1+ (list-length (first *query-completion-state*))))
+                  (third *query-completion-state*)
+                  (fourth *query-completion-state*))
+        (multiple-value-bind (comps pos) (query-find-complet-list)
+          (complete comps 0 pos *query-pos*)))))
 
 (add-hook *query-key-press-hook* 'query-mode-complete-suggest-reset)
 
@@ -316,7 +316,7 @@
   "Reset the query-completion-state if another key was pressed than a key
 that calls query-mode-complete-suggest."
   (unless (equal 'query-mode-complete-suggest
-		 (first (find-key-from-code *query-keys* code state)))
+                 (first (find-key-from-code *query-keys* code state)))
     (setf *query-completion-state* nil)
     (query-print-string)))
 
@@ -365,8 +365,8 @@ that calls query-mode-complete-suggest."
 
 (defun add-in-query-string (code state)
   (let* ((modifiers (state->modifiers state))
-	 (keysym (keycode->keysym code modifiers))
-	 (char (xlib:keysym->character *display* keysym state)))
+         (keysym (keycode->keysym code modifiers))
+         (char (xlib:keysym->character *display* keysym state)))
     (when (and char (characterp char))
       (add-char-in-query-string char))))
 
@@ -389,17 +389,17 @@ that calls query-mode-complete-suggest."
         *query-string* default
         *query-pos* (length default)
         *query-complet-list* complet-list
-	*query-completion-state* nil)
+        *query-completion-state* nil)
   (with-grab-keyboard-and-pointer (92 93 66 67 t)
     (generic-mode 'query-mode 'exit-query-loop
-		  :enter-function #'query-enter-function
-		  :leave-function #'query-leave-function
-		  :original-mode '(main-mode)))
+                  :enter-function #'query-enter-function
+                  :leave-function #'query-leave-function
+                  :original-mode '(main-mode)))
   (when (equal *query-return* :Return)
     (pushnew default *query-history* :test #'equal)
     (push *query-string* *query-history*))
   (values *query-string*
-	  *query-return*))
+          *query-return*))
 
 
 

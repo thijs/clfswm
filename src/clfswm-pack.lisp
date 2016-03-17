@@ -117,7 +117,7 @@
 (defun center-frame (frame)
   "Center frame"
   (setf (frame-x frame) (/ (- 1 (frame-w frame)) 2)
-	(frame-y frame) (/ (- 1 (frame-h frame)) 2)))
+        (frame-y frame) (/ (- 1 (frame-h frame)) 2)))
 
 ;;;,-----
 ;;;| Fill functions
@@ -125,28 +125,28 @@
 (defun fill-frame-up (frame parent &optional sp-y-found)
   "Fill a frame up"
   (let* ((y-found (or sp-y-found (find-edge-up frame parent)))
-	 (dy (- (frame-y frame) y-found)))
+         (dy (- (frame-y frame) y-found)))
     (setf (frame-y frame) y-found
-	  (frame-h frame) (+ (frame-h frame) dy))))
+          (frame-h frame) (+ (frame-h frame) dy))))
 
 (defun fill-frame-down (frame parent &optional sp-y-found)
   "Fill a frame down"
   (let* ((y-found (or sp-y-found (find-edge-down frame parent)))
-	 (dy (- y-found (frame-y2 frame))))
+         (dy (- y-found (frame-y2 frame))))
     (setf (frame-h frame) (+ (frame-h frame) dy))))
 
 
 (defun fill-frame-left (frame parent &optional sp-x-found)
   "Fill a frame left"
   (let* ((x-found (or sp-x-found (find-edge-left frame parent)))
-	 (dx (- (frame-x frame) x-found)))
+         (dx (- (frame-x frame) x-found)))
     (setf (frame-x frame) x-found
-	  (frame-w frame) (+ (frame-w frame) dx))))
+          (frame-w frame) (+ (frame-w frame) dx))))
 
 (defun fill-frame-right (frame parent &optional sp-x-found)
   "Fill a frame rigth"
   (let* ((x-found (or sp-x-found (find-edge-right frame parent)))
-	 (dx (- x-found (frame-x2 frame))))
+         (dx (- x-found (frame-x2 frame))))
     (setf (frame-w frame) (+ (frame-w frame) dx))))
 
 
@@ -157,10 +157,10 @@
   "Resize down a frame"
   (when (> (frame-w frame) 0.1)
     (setf (frame-x frame) (+ (frame-x frame) 0.01)
-	  (frame-w frame) (max (- (frame-w frame) 0.02) 0.01)))
+          (frame-w frame) (max (- (frame-w frame) 0.02) 0.01)))
   (when (> (frame-h frame) 0.1)
     (setf (frame-y frame) (+ (frame-y frame) 0.01)
-	  (frame-h frame) (max (- (frame-h frame) 0.02) 0.01))))
+          (frame-h frame) (max (- (frame-h frame) 0.02) 0.01))))
 
 
 (defun resize-minimal-frame (frame)
@@ -178,7 +178,7 @@
 
 (defun resize-half-width-right (frame)
   (let* ((new-size (/ (frame-w frame) 2))
-	 (dx (- (frame-w frame) new-size)))
+         (dx (- (frame-w frame) new-size)))
     (setf (frame-w frame) new-size)
     (incf (frame-x frame) (max dx 0))))
 
@@ -188,7 +188,7 @@
 
 (defun resize-half-height-down (frame)
   (let* ((new-size (/ (frame-h frame) 2))
-	 (dy (- (frame-h frame) new-size)))
+         (dy (- (frame-h frame) new-size)))
     (setf (frame-h frame) new-size)
     (incf (frame-y frame) (max dy 0))))
 
@@ -202,11 +202,11 @@
   "Create a new frame for each window in frame"
   (when (frame-p frame)
     (let ((windows (loop :for child :in (frame-child frame)
-		      :when (xlib:window-p child)
-		      :collect child)))
+                      :when (xlib:window-p child)
+                      :collect child)))
       (dolist (win windows)
-	(add-frame (create-frame :child (list win)) frame)
-	(remove-child-in-frame win frame)))))
+        (add-frame (create-frame :child (list win)) frame)
+        (remove-child-in-frame win frame)))))
 
 
 (defun explode-current-frame ()

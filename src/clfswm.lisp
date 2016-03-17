@@ -41,8 +41,8 @@
 (define-handler main-mode :motion-notify (window root-x root-y)
   (unless (compress-motion-notify)
     (funcall-button-from-code *main-mouse* 'motion
-			      (modifiers->state *default-modifiers*)
-			      window root-x root-y *fun-press*)))
+                              (modifiers->state *default-modifiers*)
+                              window root-x root-y *fun-press*)))
 
 
 (define-handler main-mode :configure-request (stack-mode window x y width height border-width value-mask)
@@ -126,7 +126,7 @@
 
 (define-handler main-mode :enter-notify  (window root-x root-y)
   (unless (and (> root-x (- (screen-width) 3))
-	       (> root-y (- (screen-height) 3)))
+               (> root-y (- (screen-height) 3)))
     (manage-focus window root-x root-y)))
 
 
@@ -189,8 +189,8 @@
 (defun open-display (display-str protocol)
   (multiple-value-bind (host display-num) (parse-display-string display-str)
     (setf *display* (xlib:open-display host :display display-num :protocol protocol)
-	  (xlib:display-error-handler *display*) 'error-handler
-	  (getenv "DISPLAY") display-str)))
+          (xlib:display-error-handler *display*) 'error-handler
+          (getenv "DISPLAY") display-str)))
 
 
 
@@ -207,14 +207,14 @@
   (fill-handle-event-fun-symbols)
   (assoc-keyword-handle-event 'main-mode)
   (setf *screen* (first (xlib:display-roots *display*))
-	*root* (xlib:screen-root *screen*)
-	*no-focus-window* (xlib:create-window :parent *root* :x 0 :y 0 :width 1 :height 1)
-	*default-font* (xlib:open-font *display* *default-font-string*)
-	*pixmap-buffer* (xlib:create-pixmap :width (screen-width)
-					    :height (screen-height)
-					    :depth (xlib:screen-root-depth *screen*)
-					    :drawable *root*)
-	*in-second-mode* nil
+        *root* (xlib:screen-root *screen*)
+        *no-focus-window* (xlib:create-window :parent *root* :x 0 :y 0 :width 1 :height 1)
+        *default-font* (xlib:open-font *display* *default-font-string*)
+        *pixmap-buffer* (xlib:create-pixmap :width (screen-width)
+                                            :height (screen-height)
+                                            :depth (xlib:screen-root-depth *screen*)
+                                            :drawable *root*)
+        *in-second-mode* nil
         *x-error-count* 0
         *expose-child-list* nil)
   (store-root-background)
@@ -227,21 +227,21 @@
   (map-window *no-focus-window*)
   (dbg *display*)
   (setf (xlib:window-event-mask *root*) (xlib:make-event-mask :substructure-redirect
-							      :substructure-notify
+                                                              :substructure-notify
                                                               :structure-notify
-							      :property-change
+                                                              :property-change
                                                               ;;:resize-redirect
-							      :exposure
-							      :button-press
-							      :button-release
-							      :pointer-motion))
+                                                              :exposure
+                                                              :button-press
+                                                              :button-release
+                                                              :pointer-motion))
   (xlib:display-finish-output *display*)
   ;;(intern-atoms *display*)
   (netwm-set-properties)
   (xlib:display-force-output *display*)
   (setf *child-selection* nil)
   (setf *root-frame* (create-frame :name "Root" :number 0)
-	(current-child) *root-frame*)
+        (current-child) *root-frame*)
   (call-hook *init-hook*)
   (process-existing-windows *screen*)
   (show-all-children)
@@ -255,14 +255,14 @@
 (defun read-conf-file ()
   (let* ((conf (conf-file-name)))
     (if conf
-	(handler-case (load conf)
-	  (error (c)
-	    (format t "~2%*** Error loading configuration file: ~A ***~&~A~%" conf c)
-	    (values nil (format nil "~s" c) conf))
-	  (:no-error (&rest args)
-	    (declare (ignore args))
-	    (values t nil conf)))
-	(values t nil nil))))
+        (handler-case (load conf)
+          (error (c)
+            (format t "~2%*** Error loading configuration file: ~A ***~&~A~%" conf c)
+            (values nil (format nil "~s" c) conf))
+          (:no-error (&rest args)
+            (declare (ignore args))
+            (values t nil conf)))
+        (values t nil nil))))
 
 
 
@@ -281,8 +281,8 @@
 
 
 (defun main-unprotected (&key (display (or (getenv "DISPLAY") ":0")) protocol
-			 (read-conf-file-p t) (alternate-conf nil)
-			 error-msg)
+                           (read-conf-file-p t) (alternate-conf nil)
+                           error-msg)
   (setf *clfswm-initializing* t)
   (conf-file-name alternate-conf)
   (when read-conf-file-p
@@ -308,36 +308,36 @@
     (info-mode error-msg))
   (setf *clfswm-initializing* nil)
   (catch 'exit-main-loop
-      (unwind-protect
-	   (main-loop)
-        (progn
-          (ungrab-main-keys)
-          (xlib:destroy-window *no-focus-window*)
-          (xlib:free-pixmap *pixmap-buffer*)
-          (destroy-all-frames-window)
-          (call-hook *close-hook*)
-          (clear-event-hooks)
-          (xlib:close-display *display*)
-          #+:event-debug
-          (format t "~2&Unhandled events: ~A~%" *unhandled-events*)))))
+    (unwind-protect
+         (main-loop)
+      (progn
+        (ungrab-main-keys)
+        (xlib:destroy-window *no-focus-window*)
+        (xlib:free-pixmap *pixmap-buffer*)
+        (destroy-all-frames-window)
+        (call-hook *close-hook*)
+        (clear-event-hooks)
+        (xlib:close-display *display*)
+        #+:event-debug
+        (format t "~2&Unhandled events: ~A~%" *unhandled-events*)))))
 
 
 
 (defun main (&key (display (or (getenv "DISPLAY") ":0")) protocol
-	     (read-conf-file-p t)
-	     (alternate-conf nil))
+               (read-conf-file-p t)
+               (alternate-conf nil))
   (let (error-msg)
     (catch 'exit-clfswm
       (loop
-	 (handler-case
-	     (if *other-window-manager*
-		 (run-other-window-manager)
-		 (main-unprotected :display display :protocol protocol
-				   :read-conf-file-p read-conf-file-p
-				   :alternate-conf alternate-conf
-				   :error-msg error-msg))
-	   (error (c)
-	     (let ((msg (format nil "CLFSWM Error: ~A." c)))
-	       (format t "~&~A~%Reinitializing...~%" msg)
-	       (setf error-msg (list (list msg *info-color-title*)
-				     "Reinitializing...")))))))))
+         (handler-case
+             (if *other-window-manager*
+                 (run-other-window-manager)
+                 (main-unprotected :display display :protocol protocol
+                                   :read-conf-file-p read-conf-file-p
+                                   :alternate-conf alternate-conf
+                                   :error-msg error-msg))
+           (error (c)
+             (let ((msg (format nil "CLFSWM Error: ~A." c)))
+               (format t "~&~A~%Reinitializing...~%" msg)
+               (setf error-msg (list (list msg *info-color-title*)
+                                     "Reinitializing...")))))))))

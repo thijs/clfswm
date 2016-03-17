@@ -47,18 +47,18 @@
 ;;; Desktop functions ;; +PHIL
 (defun netwm-update-desktop-property ()
   ;;  (xlib:change-property *root* :_NET_NUMBER_OF_DESKTOPS
-  ;;		   (list (length *workspace-list*)) :cardinal 32)
+  ;;       (list (length *workspace-list*)) :cardinal 32)
   ;;  (xlib:change-property *root* :_NET_DESKTOP_GEOMETRY
-  ;;		   (list (screen-width)
-  ;;			 (screen-height))
-  ;;		   :cardinal 32)
+  ;;       (list (screen-width)
+  ;;       (screen-height))
+  ;;       :cardinal 32)
   ;;  (xlib:change-property *root* :_NET_DESKTOP_VIEWPORT
-  ;;		   (list 0 0) :cardinal 32)
+  ;;       (list 0 0) :cardinal 32)
   ;;  (xlib:change-property *root* :_NET_CURRENT_DESKTOP
-  ;;		   (list 1) :cardinal 32)
+  ;;       (list 1) :cardinal 32)
 ;;; TODO
   ;;(xlib:change-property *root* :_NET_DESKTOP_NAMES
-  ;;		   (list "toto" "klm" "poi") :string 8 :transform #'xlib:char->card8))
+  ;;       (list "toto" "klm" "poi") :string 8 :transform #'xlib:char->card8))
   )
 
 
@@ -70,19 +70,19 @@
 FOCUS-WINDOW is an extra window used for _NET_SUPPORTING_WM_CHECK."
   ;; _NET_SUPPORTED
   (xlib:change-property *root* :_NET_SUPPORTED
-			(mapcar (lambda (a)
-				  (xlib:intern-atom *display* a))
-				(append +netwm-supported+
-					(mapcar 'car +netwm-window-types+)))
-			:atom 32)
+                        (mapcar (lambda (a)
+                                  (xlib:intern-atom *display* a))
+                                (append +netwm-supported+
+                                        (mapcar 'car +netwm-window-types+)))
+                        :atom 32)
   ;; _NET_SUPPORTING_WM_CHECK
   (xlib:change-property *root* :_NET_SUPPORTING_WM_CHECK
-			(list *no-focus-window*) :window 32
-			:transform #'xlib:drawable-id)
+                        (list *no-focus-window*) :window 32
+                        :transform #'xlib:drawable-id)
   (xlib:change-property *no-focus-window* :_NET_SUPPORTING_WM_CHECK
-			(list *no-focus-window*) :window 32
-			:transform #'xlib:drawable-id)
+                        (list *no-focus-window*) :window 32
+                        :transform #'xlib:drawable-id)
   (xlib:change-property *no-focus-window* :_NET_WM_NAME
-			"clfswm"
-			:string 8 :transform #'xlib:char->card8)
+                        "clfswm"
+                        :string 8 :transform #'xlib:char->card8)
   (netwm-update-desktop-property))
