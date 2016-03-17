@@ -583,7 +583,7 @@ Return the result of the last hook"
 ., +, =, *, :, %."
   (some (lambda (c)
           (char= c char))
-        '(#\- #\_ #\. #\+ #\= #\* #\: #\%)))
+        '(#\- #\_ #\. #\+ #\= #\* #\: #\% #\space)))
 
 
 (defun append-newline-space (string)

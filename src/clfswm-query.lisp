@@ -108,8 +108,8 @@
 
 
 (defun query-find-complet-list ()
-  (let* ((pos (1+ (or (position-if-not #'extended-alphanumericp *query-string*
-                                       :end *query-pos* :from-end t)
+  (let* ((pos (1+ (or (position-if #'extended-alphanumericp *query-string*
+                                   :end *query-pos* :from-end t)
                       -1)))
          (str (subseq *query-string* pos *query-pos*)))
     (when (or (> (length str) (1- *query-min-complet-char*))
