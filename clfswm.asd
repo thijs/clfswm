@@ -2,19 +2,36 @@
 ;;;; Author: Philippe Brochard <hocwp@free.fr>
 ;;;; ASDF System Definition
 ;;;
+;;;; Modified (2016) by M.L. Oppermann <M.L.Oppermann@gmail.com>
+;;;
 
-(in-package #:asdf)
+(in-package #:cl-user)
 
-(defsystem clfswm
+(defpackage #:clfswm-asd
+  (:export #:*base-directory*)
+  (:use :cl :asdf))
+
+(defparameter clfswm-asd:*base-directory*
+  (make-pathname :name nil :type nil :defaults *load-truename*))
+
+
+(in-package #:clfswm-asd)
+
+(defparameter *clfswm-version* "16??.?"
+  "This version of clfswm.")
+
+(export '*clfswm-version*)
+
+
+(defsystem #:clfswm
+  :name "CLFSWM"
   :description "CLFSWM: Fullscreen Window Manager"
-  :version "1209.2"
+  :version #.*clfswm-version*
   :author "Philippe Brochard  <hocwp@free.fr>"
   :licence "GNU Public License (GPL)"
   :components ((:module src
                         :components
                         ((:file "tools")
-                         (:file "version"
-                                :depends-on ("tools"))
                          (:file "my-html"
                                 :depends-on ("tools"))
                          (:file "package"

@@ -589,4 +589,4 @@ Pass the :no-producing-doc symbol to remove the producing doc"
 
 (defun show-version ()
   "Show the current CLFSWM version"
-  (info-mode (list *version*)))
+  (info-mode (list *clfswm-version*)))
