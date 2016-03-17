@@ -95,7 +95,7 @@
            :date-string
            :write-backtrace
            :do-execute
-           :do-shell :fdo-shell :do-shell-output
+           :do-shell :do-bash-shell :fdo-shell :do-shell-output
            :getenv
            :uquit
            :urun-prog
@@ -724,6 +724,9 @@ of the program to return.
 
 (defun do-shell (program &optional args (wait nil) (io :stream))
   (do-execute "/bin/sh" `("-c" ,program ,@args) wait io))
+
+(defun do-bash-shell (program &optional args (wait nil) (io :stream))
+  (do-execute "/bin/bash" `("-c" ,program ,@args) wait io))
 
 (defun fdo-shell (formatter &rest args)
   (do-shell (apply #'format nil formatter args)))
