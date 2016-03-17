@@ -200,6 +200,5 @@
                                              "clfswm-menu"
                                              "menu-def"
                                              "clfswm-layout")))))
-  :depends-on (#-:CLX
-               :clx
+  :depends-on (:clx :clx-truetype
                #+:sbcl :sb-posix))

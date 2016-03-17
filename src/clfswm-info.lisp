@@ -90,25 +90,42 @@
                                   :background (if (equal posy *info-selected-item*)
                                                   (get-color *info-selected-background*)
                                                   (get-color *info-background*)))
-               (funcall (if (equal posy *info-selected-item*)
-                            #'xlib:draw-image-glyphs
-                            #'xlib:draw-glyphs)
-                        *pixmap-buffer* (info-gc info)
-                        (- (+ (info-ilw info) (* posx (info-ilw info))) (info-x info))
-                        (info-y-display-coords info posy)
-                        (ensure-printable (format nil "~A" line))))
-             (+ posx (length line))))
+               (let ((printable-text (ensure-printable (format nil "~A" line))))
+                 (if *info-mode-use-ttf-fonts*
+                     (progn
+                       (when (= posx 0)
+                         (if (= (length printable-text) 1)
+                             (setf posx (+ (* 2 (info-ilw info)) (info-x info)))
+                             (setf posx (+ (info-ilw info) (info-x info)))))
+                       (let ((font (info-font info)))
+                         (draw-text *pixmap-buffer* (info-gc info) font
+                                    printable-text
+                                    (- posx (info-x info))
+                                    (info-y-display-coords info posy)
+                                    :draw-background-p (when (equal posy *info-selected-item*)
+                                                         t))
+                         (+ posx (text-line-width *screen* font printable-text))))
+                     (progn
+                       (funcall (if (equal posy *info-selected-item*)
+                                    #'xlib:draw-image-glyphs
+                                    #'xlib:draw-glyphs)
+                                *pixmap-buffer* (info-gc info)
+                                (- (+ (info-ilw info) (* posx (info-ilw info))) (info-x info))
+                                (info-y-display-coords info posy)
+                                printable-text)
+                       (+ posx (length line))))))))
     (clear-pixmap-buffer (info-window info) (info-gc info))
     (loop for line in (info-list info)
        for y from 0
        do (typecase line
-            (cons (typecase (first line)
-                    (cons (let ((posx 0))
-                            (dolist (l line)
-                              (typecase l
-                                (cons (setf posx (print-line (first l) posx y (second l))))
-                                (t (setf posx (print-line l posx y)))))))
-                    (t (print-line (first line) 0 y (second line)))))
+            (cons (cond ((= (list-length line) 2)
+                         (print-line (first line) 0 y (second line)))
+                        (t
+                         (let ((posx 0))
+                           (dolist (part line)
+                             (typecase part
+                               (cons (setf posx (print-line (first part) posx y (second part))))
+                               (t (setf posx (print-line part posx y)))))))))
             (t (print-line line 0 y))))
     (copy-pixmap-buffer (info-window info) (info-gc info))))
 
@@ -302,21 +319,51 @@ Or for colored output: a list (line_string color)
 Or ((1_word color) (2_word color) 3_word (4_word color)...)"
     (when info-list
       (setf *info-selected-item* 0)
-      (labels ((compute-size (line)
+      (labels ((text-string (line)
                  (typecase line
-                   (cons (typecase (first line)
-                           (cons (let ((val 0))
-                                   (dolist (l line val)
-                                     (incf val (typecase l
-                                                 (cons (length (first l)))
-                                                 (t (length l)))))))
-                           (t (length (first line)))))
+                   (cons (cond ((= (list-length line) 2)
+                                (first line))
+                               (t
+                                (reduce #'(lambda (a b)
+                                            (concatenate 'string a b))
+                                        (mapcar #'(lambda (part)
+                                                    (typecase part
+                                                      (cons (first part))
+                                                      (t part)))
+                                                line)))))
+                   (t line)))
+               (compute-size (line)
+                 (typecase line
+                   (cons (cond ((= (list-length line) 2)
+                                (length (first line)))
+                               (t
+                                (reduce #'+
+                                        (mapcar #'(lambda (part)
+                                                    (typecase part
+                                                      (cons (length (first part)))
+                                                      (t (length part))))
+                                                line)))))
                    (t (length line)))))
-        (let* ((font (xlib:open-font *display* *info-font-string*))
-               (ilw (xlib:max-char-width font))
-               (ilh (+ (xlib:max-char-ascent font) (xlib:max-char-descent font) 1))
+        (let* ((font (if *info-mode-use-ttf-fonts*
+                         (make-instance 'clx-truetype:font
+                                        :family *info-mode-ttf-font-family*
+                                        :subfamily *info-mode-ttf-font-subfamily*
+                                        :size *info-mode-ttf-font-size*
+                                        :antialias *info-mode-ttf-font-antialias*)
+                         (xlib:open-font *display* *info-font-string*)))
+               (ilw (if *info-mode-use-ttf-fonts*
+                        (text-width *screen* font "m")
+                        (xlib:max-char-width font)))
+               (ilh (if *info-mode-use-ttf-fonts*
+                        (+ (baseline-to-baseline *screen* font))
+                        (+ (xlib:max-char-ascent font) (xlib:max-char-descent font) 1)))
                (width (or width
-                          (min (* (+ (loop for l in info-list maximize (compute-size l)) 2) ilw)
+                          (min (if *info-mode-use-ttf-fonts*
+                                   (loop for line in info-list
+                                      maximize (+ (* ilw 3) ;; we add start extra char in menus
+                                                  (text-line-width *screen* font (text-string line))))
+                                   (* (+ (loop for line in info-list
+                                            maximize (compute-size line)) 2) ilw))
                                (screen-width))))
                (height (or height
                            (min (round (+ (* (length info-list) ilh) (/ ilh 2)))
@@ -331,14 +378,27 @@ Or ((1_word color) (2_word color) 3_word (4_word color)...)"
                                                :border-width *border-size*
                                                :border (get-color *info-border*)
                                                :event-mask '(:exposure)))
-                   (gc (xlib:create-gcontext :drawable window
-                                             :foreground (get-color *info-foreground*)
-                                             :background (get-color *info-background*)
-                                             :font font
-                                             :line-style :solid)))
+                   (gc (if *info-mode-use-ttf-fonts*
+                           (xlib:create-gcontext :drawable window
+                                                 :foreground (get-color *info-foreground*)
+                                                 :background (get-color *info-background*)
+                                                 :line-style :solid)
+                           (xlib:create-gcontext :drawable window
+                                                 :foreground (get-color *info-foreground*)
+                                                 :background (get-color *info-background*)
+                                                 :font font
+                                                 :line-style :solid))))
               (setf info (make-info :window window :gc gc :x 0 :y 0 :list info-list
                                     :font font :ilw ilw :ilh ilh
-                                    :max-x (* (loop for l in info-list maximize (compute-size l)) ilw)
+                                    :max-x (if *info-mode-use-ttf-fonts*
+                                               (loop for line in info-list
+                                                  maximize (+ (* ilh 2)
+                                                              (text-line-width *screen* font
+                                                                               (text-string line))))
+                                               (*
+                                                (loop for line in info-list
+                                                   maximize (compute-size line))
+                                                ilw))
                                     :max-y (* (length info-list) ilh)))
               (setf (window-transparency window) *info-transparency*)
               (map-window window)
@@ -349,7 +409,10 @@ Or ((1_word color) (2_word color) 3_word (4_word color)...)"
                               :original-mode '(main-mode)))
               (xlib:free-gcontext gc)
               (xlib:destroy-window window)
-              (xlib:close-font font)
+              (when font
+                (if *default-use-ttf-fonts*
+                    (setf font nil)
+                    (xlib:close-font font)))
               (xlib:display-finish-output *display*)
               (display-all-frame-info)
               (wait-no-key-or-button-press)

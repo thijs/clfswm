@@ -404,3 +404,5 @@ on the root window in the main mode with the mouse")
   'Notify-Window "Notify Window display delay")
 (defconfig *notify-window-transparency* *default-transparency*
   'Notify-window "Notify window background transparency")
+(defconfig *notify-window-text-centered* t
+  'Notify-window "Notify window center text")

@@ -26,8 +26,9 @@
 (in-package :cl-user)
 
 (defpackage clfswm
-  (:use :common-lisp :my-html :tools)
+  (:use :common-lisp :my-html :tools :clx-truetype)
   ;;  (:shadow :defun)
+  (:shadow :text-height :font :xmax :xmin :ymax :ymin)
   (:export :main
            :reload-clfswm
            :reset-clfswm
@@ -97,11 +98,36 @@ It is particulary useful with CLISP/MIT-CLX.")
 
 (defparameter *default-font* nil)
 ;;(defparameter *default-font-string* "9x15")
+
 (defconfig *default-font-string* "fixed" nil
            "The default font used in clfswm")
 
 (defconfig *color-move-window* "DeepPink" 'Main-mode
            "Color when moving or resizing a windows")
+
+;; TrueType font support
+(defconfig *default-use-ttf-fonts* nil 'Font
+           "Whether to use ttf fonts where possible")
+(defconfig *default-ttf-font-family* "Inconsolata" 'Font
+           "TrueType font family to use")
+(defconfig *default-ttf-font-subfamily* "Regular" 'Font
+           "TrueType font subfamily to use")
+(defconfig *default-ttf-font-size* 14 'Font
+           "TrueType font size to use")
+(defconfig *default-ttf-font-antialias* t 'Font
+           "TrueType font use antialias")
+
+(defconfig *info-mode-use-ttf-fonts* nil 'Font
+           "Whether to use ttf fonts for info mode")
+(defconfig *info-mode-ttf-font-family* "Inconsolata" 'Font
+           "TrueType font family to use")
+(defconfig *info-mode-ttf-font-subfamily* "Regular" 'Font
+           "TrueType font subfamily to use")
+(defconfig *info-mode-ttf-font-size* 14 'Font
+           "TrueType font size to use")
+(defconfig *info-mode-ttf-font-antialias* t 'Font
+           "TrueType font use antialias")
+
 
 (defparameter *child-selection* nil)
 

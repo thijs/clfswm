@@ -1751,14 +1751,22 @@ For window: set current child to window or its parent according to window-parent
       (add-timer 0.1 #'refresh-notify-window :refresh-notify-window)
       (when (and window gc font)
         (raise-window window)
-        (let ((text-height (- (xlib:font-ascent font) (xlib:font-descent font))))
+        (let ((text-height (if *default-use-ttf-fonts*
+                               (+ (font-ascent *screen* font) (font-descent *screen* font))
+                               (- (xlib:font-ascent font) (xlib:font-descent font)))))
           (loop for tx in text
              for i from 1 do
                (setf (xlib:gcontext-foreground gc) (text-color tx))
-               (xlib:draw-glyphs window gc
-                                 (truncate (/ (- width (* (xlib:max-char-width font) (length (text-string tx)))) 2))
-                                 (* text-height i 2)
-                                 (text-string tx))))))
+               (let* ((line-width (if *default-use-ttf-fonts*
+                                      (text-line-width *screen* font (text-string tx))
+                                      (* (xlib:max-char-width font) (length (text-string tx)))))
+                      (x (if *notify-window-text-centered*
+                             (truncate (/ (- width line-width) 2))
+                             text-height))
+                      (y (* text-height i 2)))
+                 (if *default-use-ttf-fonts*
+                     (draw-text window gc font (text-string tx) x y)
+                     (xlib:draw-glyphs window gc x y (text-string tx))))))))
 
     (defun close-notify-window ()
       (erase-timer :refresh-notify-window)
@@ -1770,7 +1778,9 @@ For window: set current child to window or its parent according to window-parent
       (when window
         (xlib:destroy-window window))
       (when font
-        (xlib:close-font font))
+        (if *default-use-ttf-fonts*
+            (setf font nil)
+            (xlib:close-font font)))
       (xlib:display-finish-output *display*)
       (setf window nil
             gc nil
@@ -1778,11 +1788,23 @@ For window: set current child to window or its parent according to window-parent
 
     (defun open-notify-window (text-list)
       (close-notify-window)
-      (setf font (xlib:open-font *display* *notify-window-font-string*))
-      (let ((text-height (- (xlib:font-ascent font) (xlib:font-descent font))))
+      (setf font (if *default-use-ttf-fonts*
+                     (make-instance 'clx-truetype:font
+                                    :family *default-ttf-font-family*
+                                    :subfamily *default-ttf-font-subfamily*
+                                    :size *default-ttf-font-size*
+                                    :antialias *default-ttf-font-antialias*)
+                     (xlib:open-font *display* *notify-window-font-string*)))
+      (let ((text-height (if *default-use-ttf-fonts*
+                             (+ (font-ascent *screen* font) (font-descent *screen* font))
+                             (- (xlib:font-ascent font) (xlib:font-descent font)))))
         (setf text text-list)
-        (setf width (* (xlib:max-char-width font) (+ (loop for tx in text-list
-                                                        maximize (length (text-string tx))) 2))
+        (setf width (if *default-use-ttf-fonts*
+                        (loop for tx in text-list
+                           maximize (+ (* text-height 2)
+                                       (text-line-width *screen* font (text-string tx))))
+                        (* (xlib:max-char-width font) (+ (loop for tx in text-list
+                                                            maximize (length (text-string tx))) 2)))
               height (+ (* text-height (length text-list) 2) text-height))
         (with-placement (*notify-window-placement* x y width height)
           (setf window (xlib:create-window :parent *root*
@@ -1795,11 +1817,16 @@ For window: set current child to window or its parent according to window-parent
                                            :border (get-color *notify-window-border*)
                                            :colormap (xlib:screen-default-colormap *screen*)
                                            :event-mask '(:exposure :key-press))
-                gc (xlib:create-gcontext :drawable window
-                                         :foreground (get-color *notify-window-foreground*)
-                                         :background (get-color *notify-window-background*)
-                                         :font font
-                                         :line-style :solid))
+                gc (if *default-use-ttf-fonts*
+                       (xlib:create-gcontext :drawable window
+                                             :foreground (get-color *notify-window-foreground*)
+                                             :background (get-color *notify-window-background*)
+                                             :line-style :solid)
+                       (xlib:create-gcontext :drawable window
+                                             :foreground (get-color *notify-window-foreground*)
+                                             :background (get-color *notify-window-background*)
+                                             :font font
+                                             :line-style :solid)))
           (setf (window-transparency window) *notify-window-transparency*)
           (when (frame-p (current-child))
             (setf current-child (current-child)))
